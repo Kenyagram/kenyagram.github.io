@@ -1,56 +1,52 @@
-/* =========================================================
-KENYAGRAM - SCRIPT.JS
-Navigation + Create Post + Feed
-========================================================= */
-
-const STORAGE_KEY = "kenyagram_posts";
+/* =====================================================
+KENYAGRAM JAVASCRIPT
+===================================================== */
 
 let posts = JSON.parse(
-localStorage.getItem(STORAGE_KEY) || "[]"
+localStorage.getItem("kenyagram_posts") || "[]"
 );
 
-const currentUser = {
-username: "kenyagram_user",
-name: "Kenyagram User"
-};
-
-/* =========================================================
-SAVE POSTS
-========================================================= */
+/* ================= SAVE ================= */
 
 function savePosts() {
-localStorage.setItem(
-STORAGE_KEY,
-JSON.stringify(posts)
-);
-}
-
-/* =========================================================
-PAGE NAVIGATION
-========================================================= */
-
-function openPage(pageName) {
 
 ```
-const pages = document.querySelectorAll(".page");
+localStorage.setItem(
+    "kenyagram_posts",
+    JSON.stringify(posts)
+);
+```
+
+}
+
+/* ================= NAVIGATION ================= */
+
+function showPage(pageName) {
+
+```
+const pages =
+    document.querySelectorAll(".page");
+
 
 pages.forEach(function(page) {
 
-    page.classList.remove("active-page");
-
-    page.style.display = "none";
+    page.classList.remove(
+        "active-page"
+    );
 
 });
 
 
-const selectedPage =
-    document.getElementById(pageName);
+const page =
+    document.getElementById(
+        pageName
+    );
 
 
-if (!selectedPage) {
+if (!page) {
 
-    console.log(
-        "Page does not exist:",
+    console.error(
+        "Page not found:",
         pageName
     );
 
@@ -59,12 +55,10 @@ if (!selectedPage) {
 }
 
 
-selectedPage.classList.add("active-page");
+page.classList.add(
+    "active-page"
+);
 
-selectedPage.style.display = "block";
-
-
-/* Update active icon */
 
 const buttons =
     document.querySelectorAll(
@@ -74,29 +68,33 @@ const buttons =
 
 buttons.forEach(function(button) {
 
-    button.classList.remove("active");
+    button.classList.remove(
+        "active"
+    );
 
 
     if (
-        button.getAttribute("data-page")
-        === pageName
+        button.dataset.page ===
+        pageName
     ) {
 
-        button.classList.add("active");
+        button.classList.add(
+            "active"
+        );
 
     }
 
 });
 
 
-window.scrollTo(0, 0);
+window.scrollTo(
+    0,
+    0
+);
 
-
-/* Refresh pages */
 
 if (
-    pageName === "home" &&
-    typeof renderFeed === "function"
+    pageName === "home"
 ) {
 
     renderFeed();
@@ -105,8 +103,7 @@ if (
 
 
 if (
-    pageName === "profile" &&
-    typeof renderProfile === "function"
+    pageName === "profile"
 ) {
 
     renderProfile();
@@ -115,8 +112,7 @@ if (
 
 
 if (
-    pageName === "reels" &&
-    typeof renderReels === "function"
+    pageName === "reels"
 ) {
 
     renderReels();
@@ -126,9 +122,7 @@ if (
 
 }
 
-/* =========================================================
-MAKE ALL NAVIGATION BUTTONS WORK
-========================================================= */
+/* ALL NAVIGATION BUTTONS */
 
 document.addEventListener(
 "click",
@@ -144,32 +138,23 @@ function(event) {
     if (!button) return;
 
 
-    const page =
-        button.getAttribute(
-            "data-page"
-        );
-
-
-    if (!page) return;
-
-
     event.preventDefault();
 
 
-    openPage(page);
+    showPage(
+        button.dataset.page
+    );
 
 }
 ```
 
 );
 
-/* =========================================================
-CREATE POST
-========================================================= */
+/* ================= CREATE ================= */
 
 let selectedFile = null;
 
-let selectedMediaURL = null;
+let selectedURL = null;
 
 const fileInput =
 document.getElementById(
@@ -191,7 +176,7 @@ document.querySelector(
 ".editor-step"
 );
 
-const previewContainer =
+const preview =
 document.querySelector(
 ".editor-preview"
 );
@@ -206,9 +191,12 @@ document.getElementById(
 "publishButton"
 );
 
-/* OPEN FILE SELECTOR */
+/* SELECT FILE */
 
-if (uploadButton && fileInput) {
+if (
+uploadButton &&
+fileInput
+) {
 
 ```
 uploadButton.addEventListener(
@@ -223,7 +211,7 @@ uploadButton.addEventListener(
 
 }
 
-/* SELECT IMAGE OR VIDEO */
+/* FILE CHANGED */
 
 if (fileInput) {
 
@@ -249,7 +237,7 @@ fileInput.addEventListener(
         ) {
 
             alert(
-                "Please select an image or video."
+                "Please choose a photo or video."
             );
 
             return;
@@ -257,67 +245,53 @@ fileInput.addEventListener(
         }
 
 
-        selectedFile = file;
+        selectedFile =
+            file;
 
 
-        selectedMediaURL =
+        selectedURL =
             URL.createObjectURL(
                 file
             );
 
 
-        if (uploadStep) {
-
-            uploadStep.classList.add(
-                "hidden"
-            );
-
-        }
+        uploadStep.classList.add(
+            "hidden"
+        );
 
 
-        if (editorStep) {
-
-            editorStep.classList.remove(
-                "hidden"
-            );
-
-        }
+        editorStep.classList.remove(
+            "hidden"
+        );
 
 
-        if (previewContainer) {
+        if (
+            file.type.startsWith(
+                "video/"
+            )
+        ) {
 
-            previewContainer.innerHTML = "";
+            preview.innerHTML = `
 
+                <video
+                    src="${selectedURL}"
+                    controls
+                    autoplay
+                    muted
+                    playsinline>
+                </video>
 
-            if (
-                file.type.startsWith(
-                    "video/"
-                )
-            ) {
+            `;
 
-                previewContainer.innerHTML = `
+        } else {
 
-                    <video
-                        src="${selectedMediaURL}"
-                        controls
-                        autoplay
-                        muted
-                        playsinline>
-                    </video>
+            preview.innerHTML = `
 
-                `;
+                <img
+                    src="${selectedURL}"
+                    alt="Preview">
 
-            } else {
-
-                previewContainer.innerHTML = `
-
-                    <img
-                        src="${selectedMediaURL}"
-                        alt="Selected photo">
-
-                `;
-
-            }
+            `;
 
         }
 
@@ -327,9 +301,7 @@ fileInput.addEventListener(
 
 }
 
-/* =========================================================
-PUBLISH POST
-========================================================= */
+/* ================= PUBLISH ================= */
 
 if (publishButton) {
 
@@ -341,7 +313,7 @@ publishButton.addEventListener(
         if (!selectedFile) {
 
             alert(
-                "Please choose a photo or video first."
+                "Choose a photo or video first."
             );
 
             return;
@@ -356,16 +328,13 @@ publishButton.addEventListener(
         reader.onload =
             function(event) {
 
-                const post = {
+                const newPost = {
 
                     id:
-                        Date.now().toString(),
+                        Date.now(),
 
                     username:
-                        currentUser.username,
-
-                    name:
-                        currentUser.name,
+                        "kenyagram_user",
 
                     media:
                         event.target.result,
@@ -379,33 +348,23 @@ publishButton.addEventListener(
                             : "image",
 
                     caption:
-                        captionInput
-                            ? captionInput.value
-                                .trim()
-                            : "",
+                        captionInput.value
+                            .trim(),
 
                     likes: 0,
 
-                    liked: false,
-
-                    saved: false,
-
-                    comments: [],
-
-                    time: "Just now",
-
-                    createdAt:
-                        Date.now()
+                    time:
+                        "Just now"
 
                 };
 
 
-                posts.push(post);
+                posts.push(
+                    newPost
+                );
+
 
                 savePosts();
-
-
-                resetCreate();
 
 
                 alert(
@@ -413,7 +372,12 @@ publishButton.addEventListener(
                 );
 
 
-                openPage("home");
+                resetCreate();
+
+
+                showPage(
+                    "home"
+                );
 
             };
 
@@ -428,9 +392,7 @@ publishButton.addEventListener(
 
 }
 
-/* =========================================================
-RESET CREATE PAGE
-========================================================= */
+/* ================= RESET CREATE ================= */
 
 function resetCreate() {
 
@@ -438,62 +400,86 @@ function resetCreate() {
 selectedFile = null;
 
 
-if (selectedMediaURL) {
+if (selectedURL) {
 
     URL.revokeObjectURL(
-        selectedMediaURL
+        selectedURL
     );
 
 }
 
 
-selectedMediaURL = null;
+selectedURL = null;
 
 
-if (fileInput) {
-
-    fileInput.value = "";
-
-}
+fileInput.value = "";
 
 
-if (captionInput) {
-
-    captionInput.value = "";
-
-}
+captionInput.value = "";
 
 
-if (previewContainer) {
-
-    previewContainer.innerHTML = "";
-
-}
+preview.innerHTML = "";
 
 
-if (editorStep) {
-
-    editorStep.classList.add(
-        "hidden"
-    );
-
-}
+editorStep.classList.add(
+    "hidden"
+);
 
 
-if (uploadStep) {
-
-    uploadStep.classList.remove(
-        "hidden"
-    );
-
-}
+uploadStep.classList.remove(
+    "hidden"
+);
 ```
 
 }
 
-/* =========================================================
-FEED
-========================================================= */
+/* ================= CANCEL CREATE ================= */
+
+const cancelButton =
+document.getElementById(
+"cancelCreateButton"
+);
+
+const cancelButton2 =
+document.getElementById(
+"cancelCreateButton2"
+);
+
+if (cancelButton) {
+
+```
+cancelButton.addEventListener(
+    "click",
+    function() {
+
+        resetCreate();
+
+        showPage(
+            "home"
+        );
+
+    }
+);
+```
+
+}
+
+if (cancelButton2) {
+
+```
+cancelButton2.addEventListener(
+    "click",
+    function() {
+
+        resetCreate();
+
+    }
+);
+```
+
+}
+
+/* ================= FEED ================= */
 
 function renderFeed() {
 
@@ -510,7 +496,9 @@ if (!feed) return;
 feed.innerHTML = "";
 
 
-if (posts.length === 0) {
+if (
+    posts.length === 0
+) {
 
     feed.innerHTML = `
 
@@ -529,7 +517,7 @@ if (posts.length === 0) {
                     </strong>
 
                     <span>
-                        Welcome to Kenyagram
+                        Welcome
                     </span>
 
                 </div>
@@ -548,7 +536,7 @@ if (posts.length === 0) {
                 </h2>
 
                 <p>
-                    Share your first photo or video.
+                    Create your first post.
                 </p>
 
             </div>
@@ -565,131 +553,129 @@ if (posts.length === 0) {
 posts
     .slice()
     .reverse()
-    .forEach(function(post) {
+    .forEach(
+        function(post) {
 
-        const article =
-            document.createElement(
-                "article"
+            const article =
+                document.createElement(
+                    "article"
+                );
+
+
+            article.className =
+                "post";
+
+
+            const media =
+                post.type === "video"
+
+                ? `
+
+                    <video
+                        src="${post.media}"
+                        controls
+                        playsinline>
+                    </video>
+
+                  `
+
+                : `
+
+                    <img
+                        src="${post.media}"
+                        alt="Post">
+
+                  `;
+
+
+            article.innerHTML = `
+
+                <div class="post-header">
+
+                    <div class="user-avatar">
+                        KG
+                    </div>
+
+                    <div class="post-user">
+
+                        <strong>
+                            ${post.username}
+                        </strong>
+
+                        <span>
+                            ${post.time}
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="post-media">
+
+                    ${media}
+
+                </div>
+
+
+                <div class="post-actions">
+
+                    <div class="left-actions">
+
+                        <button class="action-btn">
+                            ♡
+                        </button>
+
+                        <button class="action-btn">
+                            💬
+                        </button>
+
+                        <button class="action-btn">
+                            ➤
+                        </button>
+
+                    </div>
+
+
+                    <button class="action-btn">
+                        🔖
+                    </button>
+
+                </div>
+
+
+                <div class="post-info">
+
+                    <strong>
+                        ${post.likes} likes
+                    </strong>
+
+                    <p>
+
+                        <strong>
+                            ${post.username}
+                        </strong>
+
+                        ${post.caption}
+
+                    </p>
+
+                </div>
+
+            `;
+
+
+            feed.appendChild(
+                article
             );
 
-
-        article.className =
-            "post";
-
-
-        article.innerHTML = `
-
-            <div class="post-header">
-
-                <div class="user-avatar">
-                    KG
-                </div>
-
-                <div class="post-user">
-
-                    <strong>
-                        ${post.username}
-                    </strong>
-
-                    <span>
-                        ${post.time}
-                    </span>
-
-                </div>
-
-            </div>
-
-
-            <div class="post-media">
-
-                ${
-                    post.type === "video"
-
-                    ? `
-
-                        <video
-                            src="${post.media}"
-                            controls
-                            playsinline>
-                        </video>
-
-                      `
-
-                    : `
-
-                        <img
-                            src="${post.media}"
-                            alt="Kenyagram post">
-
-                      `
-                }
-
-            </div>
-
-
-            <div class="post-actions">
-
-                <div class="left-actions">
-
-                    <button
-                        class="action-btn">
-                        ♡
-                    </button>
-
-                    <button
-                        class="action-btn">
-                        💬
-                    </button>
-
-                    <button
-                        class="action-btn">
-                        ➤
-                    </button>
-
-                </div>
-
-
-                <button
-                    class="action-btn">
-                    🔖
-                </button>
-
-            </div>
-
-
-            <div class="post-info">
-
-                <strong>
-                    ${post.likes} likes
-                </strong>
-
-                <p>
-
-                    <strong>
-                        ${post.username}
-                    </strong>
-
-                    ${post.caption}
-
-                </p>
-
-            </div>
-
-        `;
-
-
-        feed.appendChild(
-            article
-        );
-
-    });
+        }
+    );
 ```
 
 }
 
-/* =========================================================
-PROFILE
-========================================================= */
+/* ================= PROFILE ================= */
 
 function renderProfile() {
 
@@ -703,23 +689,39 @@ const grid =
 if (!grid) return;
 
 
-const userPosts =
+const myPosts =
     posts.filter(
         function(post) {
 
             return (
                 post.username ===
-                currentUser.username
+                "kenyagram_user"
             );
 
         }
     );
 
 
+const count =
+    document.querySelector(
+        "[data-post-count]"
+    );
+
+
+if (count) {
+
+    count.textContent =
+        myPosts.length;
+
+}
+
+
 grid.innerHTML = "";
 
 
-if (userPosts.length === 0) {
+if (
+    myPosts.length === 0
+) {
 
     grid.innerHTML = `
 
@@ -742,60 +744,60 @@ if (userPosts.length === 0) {
 }
 
 
-userPosts
+myPosts
     .slice()
     .reverse()
-    .forEach(function(post) {
+    .forEach(
+        function(post) {
 
-        const item =
-            document.createElement(
-                "div"
+            const item =
+                document.createElement(
+                    "div"
+                );
+
+
+            item.className =
+                "profile-grid-item";
+
+
+            if (
+                post.type === "video"
+            ) {
+
+                item.innerHTML = `
+
+                    <video
+                        src="${post.media}"
+                        muted
+                        playsinline>
+                    </video>
+
+                `;
+
+            } else {
+
+                item.innerHTML = `
+
+                    <img
+                        src="${post.media}"
+                        alt="Post">
+
+                `;
+
+            }
+
+
+            grid.appendChild(
+                item
             );
 
-
-        item.className =
-            "profile-grid-item";
-
-
-        if (
-            post.type === "video"
-        ) {
-
-            item.innerHTML = `
-
-                <video
-                    src="${post.media}"
-                    muted
-                    playsinline>
-                </video>
-
-            `;
-
-        } else {
-
-            item.innerHTML = `
-
-                <img
-                    src="${post.media}"
-                    alt="Post">
-
-            `;
-
         }
-
-
-        grid.appendChild(
-            item
-        );
-
-    });
+    );
 ```
 
 }
 
-/* =========================================================
-REELS
-========================================================= */
+/* ================= REELS ================= */
 
 function renderReels() {
 
@@ -809,7 +811,7 @@ const container =
 if (!container) return;
 
 
-const reels =
+const videos =
     posts.filter(
         function(post) {
 
@@ -825,7 +827,9 @@ const reels =
 container.innerHTML = "";
 
 
-if (reels.length === 0) {
+if (
+    videos.length === 0
+) {
 
     container.innerHTML = `
 
@@ -840,7 +844,7 @@ if (reels.length === 0) {
             </h2>
 
             <p>
-                Share your first video.
+                Upload a video to create a Reel.
             </p>
 
             <button
@@ -860,122 +864,191 @@ if (reels.length === 0) {
 }
 
 
-reels
+videos
     .slice()
     .reverse()
-    .forEach(function(post) {
+    .forEach(
+        function(post) {
 
-        const reel =
-            document.createElement(
-                "div"
+            const reel =
+                document.createElement(
+                    "div"
+                );
+
+
+            reel.className =
+                "post";
+
+
+            reel.innerHTML = `
+
+                <div class="post-header">
+
+                    <div class="user-avatar">
+                        KG
+                    </div>
+
+                    <div class="post-user">
+
+                        <strong>
+                            ${post.username}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="post-media">
+
+                    <video
+                        src="${post.media}"
+                        controls
+                        playsinline>
+                    </video>
+
+                </div>
+
+
+                <div class="post-info">
+
+                    <p>
+                        ${post.caption}
+                    </p>
+
+                </div>
+
+            `;
+
+
+            container.appendChild(
+                reel
             );
 
-
-        reel.className =
-            "post";
-
-
-        reel.innerHTML = `
-
-            <div class="post-header">
-
-                <div class="user-avatar">
-                    KG
-                </div>
-
-                <div class="post-user">
-
-                    <strong>
-                        ${post.username}
-                    </strong>
-
-                </div>
-
-            </div>
-
-
-            <div class="post-media">
-
-                <video
-                    src="${post.media}"
-                    controls
-                    playsinline>
-                </video>
-
-            </div>
-
-
-            <div class="post-info">
-
-                <p>
-                    ${post.caption}
-                </p>
-
-            </div>
-
-        `;
-
-
-        container.appendChild(
-            reel
-        );
-
-    });
+        }
+    );
 ```
 
 }
 
-/* =========================================================
-START WEBSITE
-========================================================= */
+/* ================= SEARCH ================= */
+
+const searchInput =
+document.getElementById(
+"searchInput"
+);
+
+const searchResults =
+document.getElementById(
+"searchResults"
+);
+
+if (searchInput) {
+
+```
+searchInput.addEventListener(
+    "input",
+    function() {
+
+        const query =
+            searchInput.value
+                .trim()
+                .toLowerCase();
+
+
+        searchResults.innerHTML =
+            "";
+
+
+        if (!query) return;
+
+
+        const users = [
+
+            "kenyagram",
+
+            "kenyagram_user",
+
+            "football",
+
+            "messi",
+
+            "manchestercity"
+
+        ];
+
+
+        users
+            .filter(
+                function(user) {
+
+                    return user
+                        .toLowerCase()
+                        .includes(
+                            query
+                        );
+
+                }
+            )
+            .forEach(
+                function(user) {
+
+                    const result =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    result.className =
+                        "conversation";
+
+
+                    result.innerHTML = `
+
+                        <div class="user-avatar">
+                            ${user
+                                .slice(0,2)
+                                .toUpperCase()}
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                ${user}
+                            </strong>
+
+                            <p>
+                                Kenyagram user
+                            </p>
+
+                        </div>
+
+                    `;
+
+
+                    searchResults.appendChild(
+                        result
+                    );
+
+                }
+            );
+
+    }
+);
+```
+
+}
+
+/* ================= START ================= */
 
 document.addEventListener(
 "DOMContentLoaded",
 function() {
 
 ```
-    /*
-     * IMPORTANT:
-     * Home is the first page shown.
-     */
-
-    const allPages =
-        document.querySelectorAll(
-            ".page"
-        );
-
-
-    allPages.forEach(
-        function(page) {
-
-            page.style.display =
-                "none";
-
-            page.classList.remove(
-                "active-page"
-            );
-
-        }
+    showPage(
+        "home"
     );
-
-
-    const home =
-        document.getElementById(
-            "home"
-        );
-
-
-    if (home) {
-
-        home.style.display =
-            "block";
-
-        home.classList.add(
-            "active-page"
-        );
-
-    }
-
 
     renderFeed();
 
