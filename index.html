@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pixora</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f7f7f9;
+      color: #171717;
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    /* =========================
+       WELCOME SCREEN
+    ========================= */
+
+    #welcome {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+
+      background:
+        radial-gradient(circle at 50% 35%, #5d247f 0%, transparent 30%),
+        radial-gradient(circle at 10% 90%, #8d155f 0%, transparent 30%),
+        radial-gradient(circle at 90% 10%, #173c91 0%, transparent 30%),
+        #08030f;
+
+      transition: opacity .8s ease, visibility .8s ease;
+    }
+
+    #welcome.hide {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .welcome-content {
+      width: 90%;
+      max-width: 600px;
+      animation: welcomeIn 1.2s ease;
+    }
+
+    @keyframes welcomeIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px) scale(.95);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* Logo */
+
+    .logo-box {
+      width: 165px;
+      height: 165px;
+      margin: auto;
+
+      border-radius: 45px;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.15);
+
+      box-shadow:
+        0 0 35px rgba(255,20,147,.3),
+        0 0 80px rgba(90,50,255,.2);
+
+      animation: logoFloat 3s ease-in-out infinite;
+    }
+
+    .logo-box img {
+      width: 145px;
+      height: 145px;
+      object-fit: contain;
+      border-radius: 38px;
+    }
+
+    @keyframes logoFloat {
+      0%, 100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    .brand {
+      margin-top: 28px;
+
+      font-size: clamp(48px, 10vw, 72px);
+      font-weight: 800;
+      letter-spacing: -3px;
+
+      background: linear-gradient(
+        90deg,
+        #ffffff,
+        #ff91db,
+        #a776ff,
+        #55a9ff,
+        #ffffff
+      );
+
+      background-size: 300%;
+
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+
+      animation: gradient 5s linear infinite;
+    }
+
+    @keyframes gradient {
+      from {
+        background-position: 0%;
+      }
+
+      to {
+        background-position: 300%;
+      }
+    }
+
+    .tagline {
+      margin-top: 8px;
+      color: rgba(255,255,255,.65);
+      letter-spacing: 4px;
+      font-size: 13px;
+    }
+
+    .welcome-text {
+      max-width: 450px;
+      margin: 25px auto;
+
+      color: rgba(255,255,255,.7);
+      line-height: 1.6;
+    }
+
+    .start-btn {
+      border: none;
+      border-radius: 50px;
+
+      padding: 16px 38px;
+
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+
+      background: linear-gradient(
+        100deg,
+        #ff1493,
+        #913cff,
+        #347cff
+      );
+
+      box-shadow: 0 10px 35px rgba(140,40,220,.4);
+
+      transition: .3s;
+    }
+
+    .start-btn:hover {
+      transform: translateY(-4px) scale(1.04);
+    }
+
+
+    /* =========================
+       MAIN PIXORA APP
+    ========================= */
+
+    #app {
+      display: none;
+      min-height: 100vh;
+      padding-bottom: 80px;
+    }
+
+    /* Top bar */
+
+    .topbar {
+      height: 65px;
+
+      background: white;
+      border-bottom: 1px solid #e5e5e5;
+
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      padding: 0 25px;
+
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .pixora-name {
+      font-size: 28px;
+      font-weight: 800;
+
+      background: linear-gradient(
+        90deg,
+        #ff1493,
+        #913cff,
+        #347cff
+      );
+
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .top-icons {
+      display: flex;
+      gap: 18px;
+    }
+
+    .top-icons button {
+      border: none;
+      background: transparent;
+      font-size: 24px;
+    }
+
+
+    /* =========================
+       HOME
+    ========================= */
+
+    .page {
+      width: 100%;
+      max-width: 650px;
+      margin: auto;
+      padding: 18px 12px;
+    }
+
+    /* Stories */
+
+    .stories {
+      display: flex;
+      gap: 15px;
+      overflow-x: auto;
+      padding-bottom: 18px;
+    }
+
+    .stories::-webkit-scrollbar {
+      display: none;
+    }
+
+    .story {
+      min-width: 65px;
+      text-align: center;
+      font-size: 11px;
+    }
+
+    .story-ring {
+      width: 62px;
+      height: 62px;
+      padding: 3px;
+      margin-bottom: 5px;
+
+      border-radius: 50%;
+
+      background: linear-gradient(
+        135deg,
+        #ff1493,
+        #9a3cff,
+        #277dff
+      );
+    }
+
+    .story-picture {
+      width: 100%;
+      height: 100%;
+
+      border-radius: 50%;
+
+      background: #eee;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      font-size: 25px;
+    }
+
+
+    /* Post */
+
+    .post {
+      background: white;
+
+      border: 1px solid #e3e3e3;
+      border-radius: 14px;
+
+      overflow: hidden;
+
+      margin-bottom: 20px;
+    }
+
+    .post-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      padding: 12px;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+
+      border-radius: 50%;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      color: white;
+      font-weight: bold;
+
+      background: linear-gradient(
+        135deg,
+        #ff1493,
+        #7b3cff
+      );
+    }
+
+    .username {
+      font-weight: bold;
+    }
+
+    .post-image {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      font-size: 70px;
+      color: white;
+
+      background:
+        linear-gradient(
+          135deg,
+          #ff1493,
+          #843cff,
+          #2686ff
+        );
+    }
+
+    .post-actions {
+      display: flex;
+      gap: 18px;
+
+      padding: 12px;
+    }
+
+    .post-actions button {
+      border: none;
+      background: transparent;
+
+      font-size: 25px;
+    }
+
+    .post-info {
+      padding: 0 12px 16px;
+      line-height: 1.5;
+    }
+
+
+    /* =========================
+       OTHER PAGES
+    ========================= */
+
+    .other-page {
+      display: none;
+
+      min-height: calc(100vh - 145px);
+
+      padding: 60px 20px;
+
+      text-align: center;
+    }
+
+    .other-page h2 {
+      font-size: 30px;
+      margin-bottom: 12px;
+    }
+
+    .other-page p {
+      color: #777;
+    }
+
+    .search-box {
+      width: 100%;
+      max-width: 500px;
+
+      padding: 15px 20px;
+
+      border: none;
+      border-radius: 30px;
+
+      background: #e9e9ed;
+
+      outline: none;
+
+      font-size: 16px;
+    }
+
+
+    /* =========================
+       BOTTOM NAVIGATION
+    ========================= */
+
+    .bottom-nav {
+      position: fixed;
+
+      bottom: 0;
+      left: 0;
+
+      width: 100%;
+      height: 75px;
+
+      background: rgba(255,255,255,.96);
+
+      border-top: 1px solid #dedede;
+
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+
+      z-index: 100;
+
+      backdrop-filter: blur(15px);
+    }
+
+    .nav-btn {
+      border: none;
+      background: transparent;
+
+      color: #777;
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      gap: 4px;
+
+      font-size: 11px;
+
+      transition: .2s;
+    }
+
+    .nav-btn.active {
+      color: #7435ff;
+      font-weight: bold;
+    }
+
+    .nav-icon {
+      font-size: 25px;
+    }
+
+    .create-btn {
+      width: 50px;
+      height: 50px;
+
+      border: none;
+      border-radius: 17px;
+
+      color: white;
+      font-size: 28px;
+
+      background: linear-gradient(
+        135deg,
+        #ff1493,
+        #873cff,
+        #287cff
+      );
+
+      box-shadow:
+        0 6px 20px rgba(120,40,220,.3);
+
+      transition: .3s;
+    }
+
+    .create-btn:hover {
+      transform: scale(1.1);
+    }
+
+
+    /* Mobile */
+
+    @media(max-width:600px) {
+
+      .logo-box {
+        width: 135px;
+        height: 135px;
+      }
+
+      .logo-box img {
+        width: 115px;
+        height: 115px;
+      }
+
+      .topbar {
+        padding: 0 15px;
+      }
+
+      .page {
+        padding: 12px 7px;
+      }
+    }
+  </style>
+</head>
+
+
+<body>
+
+
+  <!-- ==================================================
+       WELCOME SCREEN
+  =================================================== -->
+
+  <section id="welcome">
+
+    <div class="welcome-content">
+
+      <div class="logo-box">
+
+        <img
+          src="pixora-logo.png"
+          alt="Pixora Logo"
+        >
+
+      </div>
+
+      <h1 class="brand">
+        Pixora
+      </h1>
+
+      <p class="tagline">
+        SHARE · CONNECT · CREATE
+      </p>
+
+      <p class="welcome-text">
+        Discover amazing people, share your moments,
+        and connect with a community that inspires you.
+      </p>
+
+      <button
+        class="start-btn"
+        onclick="startPixora()"
+      >
+        ✨ Get Started
+      </button>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- ==================================================
+       PIXORA APP
+  =================================================== -->
+
+  <section id="app">
+
+
+    <!-- TOP BAR -->
+
+    <header class="topbar">
+
+      <div class="pixora-name">
+        Pixora
+      </div>
+
+      <div class="top-icons">
+
+        <button onclick="showNotification()">
+          ♡
+        </button>
+
+        <button onclick="openMessages()">
+          ✉
+        </button>
+
+      </div>
+
+    </header>
+
+
+
+    <!-- =========================
+         HOME PAGE
+    ========================== -->
+
+    <main
+      id="homePage"
+      class="page"
+    >
+
+      <!-- STORIES -->
+
+      <div class="stories">
+
+        <div class="story">
+
+          <div class="story-ring">
+            <div class="story-picture">
+              +
+            </div>
+          </div>
+
+          Your story
+
+        </div>
+
+
+        <div class="story">
+
+          <div class="story-ring">
+            <div class="story-picture">
+              😎
+            </div>
+          </div>
+
+          Alex
+
+        </div>
+
+
+        <div class="story">
+
+          <div class="story-ring">
+            <div class="story-picture">
+              😊
+            </div>
+          </div>
+
+          Sarah
+
+        </div>
+
+
+        <div class="story">
+
+          <div class="story-ring">
+            <div class="story-picture">
+              ⚽
+            </div>
+          </div>
+
+          David
+
+        </div>
+
+
+        <div class="story">
+
+          <div class="story-ring">
+            <div class="story-picture">
+              🌟
+            </div>
+          </div>
+
+          Maya
+
+        </div>
+
+      </div>
+
+
+
+      <!-- POST -->
+
+      <article class="post">
+
+        <div class="post-header">
+
+          <div class="avatar">
+            P
+          </div>
+
+          <div class="username">
+            pixora
+          </div>
+
+        </div>
+
+
+        <div class="post-image">
+          📸
+        </div>
+
+
+        <div class="post-actions">
+
+          <button onclick="likePost(this)">
+            ♡
+          </button>
+
+          <button>
+            💬
+          </button>
+
+          <button>
+            ↗
+          </button>
+
+        </div>
+
+
+        <div class="post-info">
+
+          <strong>
+            128 likes
+          </strong>
+
+          <p>
+            <strong>pixora</strong>
+            Welcome to Pixora! ✨
+            Your social world starts here.
+          </p>
+
+        </div>
+
+      </article>
+
+
+    </main>
+
+
+
+    <!-- =========================
+         SEARCH PAGE
+    ========================== -->
+
+    <section
+      id="searchPage"
+      class="other-page"
+    >
+
+      <h2>Search 🔍</h2>
+
+      <p>
+        Find people and discover new content.
+      </p>
+
+      <br>
+
+      <input
+        class="search-box"
+        type="text"
+        placeholder="Search Pixora..."
+      >
+
+    </section>
+
+
+
+    <!-- =========================
+         MESSAGES PAGE
+    ========================== -->
+
+    <section
+      id="messagesPage"
+      class="other-page"
+    >
+
+      <h2>Messages 💬</h2>
+
+      <p>
+        Your conversations will appear here.
+      </p>
+
+    </section>
+
+
+
+    <!-- =========================
+         PROFILE PAGE
+    ========================== -->
+
+    <section
+      id="profilePage"
+      class="other-page"
+    >
+
+      <div class="avatar"
+           style="margin: auto; width:80px; height:80px;">
+        👤
+      </div>
+
+      <br>
+
+      <h2>Your Profile</h2>
+
+      <p>
+        Your Pixora profile will appear here.
+      </p>
+
+    </section>
+
+
+
+    <!-- =========================
+         BOTTOM NAVIGATION
+    ========================== -->
+
+    <nav class="bottom-nav">
+
+
+      <!-- HOME -->
+
+      <button
+        class="nav-btn active"
+        onclick="showPage('home')"
+      >
+
+        <span class="nav-icon">
+          ⌂
+        </span>
+
+        Home
+
+      </button>
+
+
+
+      <!-- SEARCH -->
+
+      <button
+        class="nav-btn"
+        onclick="showPage('search')"
+      >
+
+        <span class="nav-icon">
+          ⌕
+        </span>
+
+        Search
+
+      </button>
+
+
+
+      <!-- CREATE -->
+
+      <button
+        class="create-btn"
+        onclick="createPost()"
+      >
+
+        +
+
+      </button>
+
+
+
+      <!-- MESSAGES -->
+
+      <button
+        class="nav-btn"
+        onclick="showPage('messages')"
+      >
+
+        <span class="nav-icon">
+          ♡
+        </span>
+
+        Messages
+
+      </button>
+
+
+
+      <!-- PROFILE -->
+
+      <button
+        class="nav-btn"
+        onclick="showPage('profile')"
+      >
+
+        <span class="nav-icon">
+          ○
+        </span>
+
+        Profile
+
+      </button>
+
+
+    </nav>
+
+  </section>
+
+
+
+  <!-- ==================================================
+       JAVASCRIPT
+  =================================================== -->
+
+  <script>
+
+    /* Start Pixora */
+
+    function startPixora() {
+
+      const welcome =
+        document.getElementById("welcome");
+
+      const app =
+        document.getElementById("app");
+
+      welcome.classList.add("hide");
+
+      setTimeout(function() {
+
+        welcome.style.display = "none";
+
+        app.style.display = "block";
+
+        window.scrollTo(0, 0);
+
+      }, 800);
+    }
+
+
+
+    /* Show pages */
+
+    function showPage(page) {
+
+      const pages = [
+        "homePage",
+        "searchPage",
+        "messagesPage",
+        "profilePage"
+      ];
+
+      pages.forEach(function(id) {
+
+        document.getElementById(id).style.display =
+          "none";
+
+      });
+
+
+      if (page === "home") {
+
+        document.getElementById("homePage").style.display =
+          "block";
+
+      }
+
+
+      if (page === "search") {
+
+        document.getElementById("searchPage").style.display =
+          "block";
+
+      }
+
+
+      if (page === "messages") {
+
+        document.getElementById("messagesPage").style.display =
+          "block";
+
+      }
+
+
+      if (page === "profile") {
+
+        document.getElementById("profilePage").style.display =
+          "block";
+
+      }
+
+
+      /* Change active navigation */
+
+      document
+        .querySelectorAll(".nav-btn")
+        .forEach(function(button) {
+
+          button.classList.remove("active");
+
+        });
+
+
+      /* Find the button matching the page */
+
+      const buttons =
+        document.querySelectorAll(".nav-btn");
+
+      if (page === "home") buttons[0].classList.add("active");
+      if (page === "search") buttons[1].classList.add("active");
+      if (page === "messages") buttons[2].classList.add("active");
+      if (page === "profile") buttons[3].classList.add("active");
+
+    }
+
+
+
+    /* Create post */
+
+    function createPost() {
+
+      alert(
+        "📸 Pixora Create\n\n" +
+        "We'll build the real post creator next!"
+      );
+
+    }
+
+
+
+    /* Like */
+
+    function likePost(button) {
+
+      if (button.textContent.trim() === "♡") {
+
+        button.textContent = "♥";
+        button.style.color = "#ff1493";
+
+      } else {
+
+        button.textContent = "♡";
+        button.style.color = "";
+
+      }
+
+    }
+
+
+
+    /* Notifications */
+
+    function showNotification() {
+
+      alert("♡ You have no new notifications.");
+
+    }
+
+
+
+    /* Messages */
+
+    function openMessages() {
+
+      showPage("messages");
+
+    }
+
+  </script>
+
+</body>
+</html>
