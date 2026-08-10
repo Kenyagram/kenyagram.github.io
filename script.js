@@ -1,658 +1,335 @@
 /* =========================================================
-KENYAGRAM - MAIN JAVASCRIPT
-Instagram-style social media functionality
+KENYAGRAM - SCRIPT.JS
+Navigation + Create Post + Feed
 ========================================================= */
-
-/* ================= STORAGE ================= */
 
 const STORAGE_KEY = "kenyagram_posts";
 
-let posts = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+let posts = JSON.parse(
+localStorage.getItem(STORAGE_KEY) || "[]"
+);
 
-let currentUser = {
+const currentUser = {
 username: "kenyagram_user",
 name: "Kenyagram User"
 };
 
-/* ================= HELPERS ================= */
+/* =========================================================
+SAVE POSTS
+========================================================= */
 
 function savePosts() {
-localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
+localStorage.setItem(
+STORAGE_KEY,
+JSON.stringify(posts)
+);
 }
 
-function escapeHTML(text) {
-const div = document.createElement("div");
-div.textContent = text;
-return div.innerHTML;
-}
+/* =========================================================
+PAGE NAVIGATION
+========================================================= */
 
-function formatNumber(number) {
-if (number >= 1000000) {
-return (number / 1000000).toFixed(1) + "M";
-}
+function openPage(pageName) {
 
 ```
-if (number >= 1000) {
-    return (number / 1000).toFixed(1) + "K";
-}
-
-return number;
-```
-
-}
-
-function generateID() {
-return Date.now().toString() + Math.random().toString(36).slice(2);
-}
-
-/* ================= PAGE NAVIGATION ================= */
-
 const pages = document.querySelectorAll(".page");
-const navItems = document.querySelectorAll("[data-page]");
 
-function showPage(pageName) {
+pages.forEach(function(page) {
 
-```
-pages.forEach(page => {
     page.classList.remove("active-page");
-});
 
-const target = document.getElementById(pageName);
-
-if (target) {
-    target.classList.add("active-page");
-}
-
-navItems.forEach(item => {
-    item.classList.remove("active");
-
-    if (item.dataset.page === pageName) {
-        item.classList.add("active");
-    }
-});
-
-window.scrollTo({
-    top: 0,
-    behavior: "smooth"
-});
-
-if (pageName === "home") {
-    renderFeed();
-}
-
-if (pageName === "profile") {
-    renderProfile();
-}
-
-if (pageName === "reels") {
-    renderReels();
-}
-```
-
-}
-
-document.addEventListener("click", function(event) {
-
-```
-const navigationButton =
-    event.target.closest("[data-page]");
-
-if (!navigationButton) return;
-
-const page = navigationButton.dataset.page;
-
-if (page) {
-    showPage(page);
-}
-```
+    page.style.display = "none";
 
 });
 
-/* ================= FEED ================= */
 
-const feed = document.querySelector(".feed");
+const selectedPage =
+    document.getElementById(pageName);
 
-function renderFeed() {
 
-```
-if (!feed) return;
+if (!selectedPage) {
 
-feed.innerHTML = "";
-
-if (posts.length === 0) {
-
-    feed.innerHTML = `
-        <article class="post">
-
-            <div class="post-header">
-
-                <div class="user-avatar">
-                    KG
-                </div>
-
-                <div class="post-user">
-                    <strong>kenyagram</strong>
-                    <span>Welcome to Kenyagram</span>
-                </div>
-
-                <button class="more-button">
-                    •••
-                </button>
-
-            </div>
-
-            <div class="post-media welcome-media">
-
-                <div class="welcome-logo">
-                    K
-                </div>
-
-                <h2>Welcome to Kenyagram</h2>
-
-                <p>
-                    Share your first photo or video.
-                </p>
-
-            </div>
-
-        </article>
-    `;
+    console.log(
+        "Page does not exist:",
+        pageName
+    );
 
     return;
-}
-
-
-posts
-    .slice()
-    .reverse()
-    .forEach(post => {
-
-        const article = document.createElement("article");
-
-        article.className = "post";
-
-        article.dataset.id = post.id;
-
-        const mediaHTML =
-            post.type === "video"
-                ? `<video src="${post.media}" controls playsinline></video>`
-                : `<img src="${post.media}" alt="Kenyagram post">`;
-
-        article.innerHTML = `
-
-            <div class="post-header">
-
-                <div class="user-avatar">
-                    ${escapeHTML(
-                        post.username
-                            .slice(0, 2)
-                            .toUpperCase()
-                    )}
-                </div>
-
-                <div class="post-user">
-
-                    <strong>
-                        ${escapeHTML(post.username)}
-                    </strong>
-
-                    <span>
-                        ${post.time || "Just now"}
-                    </span>
-
-                </div>
-
-                <button class="more-button">
-                    •••
-                </button>
-
-            </div>
-
-
-            <div class="post-media">
-
-                ${mediaHTML}
-
-            </div>
-
-
-            <div class="post-actions">
-
-                <div class="left-actions">
-
-                    <button
-                        class="action-btn like-button ${
-                            post.liked ? "liked" : ""
-                        }"
-                        title="Like"
-                    >
-                        ${post.liked ? "♥" : "♡"}
-                    </button>
-
-
-                    <button
-                        class="action-btn comment-button"
-                        title="Comment"
-                    >
-                        💬
-                    </button>
-
-
-                    <button
-                        class="action-btn share-button"
-                        title="Share"
-                    >
-                        ➤
-                    </button>
-
-                </div>
-
-
-                <button
-                    class="action-btn save-button ${
-                        post.saved ? "saved" : ""
-                    }"
-                    title="Save"
-                >
-                    ${post.saved ? "🔖" : "🔖"}
-                </button>
-
-            </div>
-
-
-            <div class="post-info">
-
-                <strong>
-                    ${formatNumber(post.likes || 0)}
-                    likes
-                </strong>
-
-                <p>
-
-                    <strong>
-                        ${escapeHTML(post.username)}
-                    </strong>
-
-                    ${escapeHTML(post.caption || "")}
-
-                </p>
-
-
-                <button class="view-comments">
-
-                    View comments
-
-                </button>
-
-
-                <div class="comment-box">
-
-                    <input
-                        class="comment-input"
-                        placeholder="Add a comment..."
-                        maxlength="300"
-                    >
-
-                    <button class="post-comment">
-                        Post
-                    </button>
-
-                </div>
-
-            </div>
-
-        `;
-
-
-        feed.appendChild(article);
-
-    });
-```
 
 }
 
-/* ================= LIKE ================= */
 
-document.addEventListener("click", function(event) {
+selectedPage.classList.add("active-page");
 
-```
-const likeButton =
-    event.target.closest(".like-button");
+selectedPage.style.display = "block";
 
-if (!likeButton) return;
 
-const postElement =
-    likeButton.closest(".post");
+/* Update active icon */
 
-if (!postElement) return;
-
-const id = postElement.dataset.id;
-
-const post =
-    posts.find(item => item.id === id);
-
-if (!post) return;
-
-post.liked = !post.liked;
-
-post.likes =
-    Math.max(
-        0,
-        (post.likes || 0) +
-        (post.liked ? 1 : -1)
+const buttons =
+    document.querySelectorAll(
+        "[data-page]"
     );
 
-savePosts();
 
-renderFeed();
-```
+buttons.forEach(function(button) {
 
-});
+    button.classList.remove("active");
 
-/* ================= SAVE ================= */
 
-document.addEventListener("click", function(event) {
+    if (
+        button.getAttribute("data-page")
+        === pageName
+    ) {
 
-```
-const saveButton =
-    event.target.closest(".save-button");
-
-if (!saveButton) return;
-
-const postElement =
-    saveButton.closest(".post");
-
-if (!postElement) return;
-
-const id = postElement.dataset.id;
-
-const post =
-    posts.find(item => item.id === id);
-
-if (!post) return;
-
-post.saved = !post.saved;
-
-savePosts();
-
-renderFeed();
-```
-
-});
-
-/* ================= COMMENTS ================= */
-
-document.addEventListener("click", function(event) {
-
-```
-const commentButton =
-    event.target.closest(".post-comment");
-
-if (!commentButton) return;
-
-const postElement =
-    commentButton.closest(".post");
-
-const input =
-    postElement.querySelector(".comment-input");
-
-const text =
-    input.value.trim();
-
-if (!text) return;
-
-const post =
-    posts.find(
-        item =>
-            item.id === postElement.dataset.id
-    );
-
-if (!post) return;
-
-if (!post.comments) {
-    post.comments = [];
-}
-
-post.comments.push({
-    username: currentUser.username,
-    text: text
-});
-
-input.value = "";
-
-savePosts();
-
-alert("Comment posted!");
-```
-
-});
-
-/* ================= SHARE ================= */
-
-document.addEventListener("click", async function(event) {
-
-```
-const shareButton =
-    event.target.closest(".share-button");
-
-if (!shareButton) return;
-
-const postElement =
-    shareButton.closest(".post");
-
-const url =
-    window.location.href +
-    "#post-" +
-    postElement.dataset.id;
-
-try {
-
-    if (navigator.share) {
-
-        await navigator.share({
-            title: "Kenyagram",
-            text: "Check out this post on Kenyagram!",
-            url: url
-        });
-
-    } else {
-
-        await navigator.clipboard.writeText(url);
-
-        alert("Post link copied!");
+        button.classList.add("active");
 
     }
 
-} catch (error) {
+});
 
-    console.log("Share cancelled.");
+
+window.scrollTo(0, 0);
+
+
+/* Refresh pages */
+
+if (
+    pageName === "home" &&
+    typeof renderFeed === "function"
+) {
+
+    renderFeed();
+
+}
+
+
+if (
+    pageName === "profile" &&
+    typeof renderProfile === "function"
+) {
+
+    renderProfile();
+
+}
+
+
+if (
+    pageName === "reels" &&
+    typeof renderReels === "function"
+) {
+
+    renderReels();
 
 }
 ```
 
-});
+}
 
-/* ================= CREATE POST ================= */
+/* =========================================================
+MAKE ALL NAVIGATION BUTTONS WORK
+========================================================= */
 
-const fileInput =
-document.getElementById("fileInput");
+document.addEventListener(
+"click",
+function(event) {
 
-const uploadButton =
-document.getElementById("uploadButton");
+```
+    const button =
+        event.target.closest(
+            "[data-page]"
+        );
 
-const uploadStep =
-document.querySelector(".upload-step");
 
-const editorStep =
-document.querySelector(".editor-step");
+    if (!button) return;
 
-const previewContainer =
-document.querySelector(".editor-preview");
 
-const captionInput =
-document.getElementById("captionInput");
+    const page =
+        button.getAttribute(
+            "data-page"
+        );
 
-const publishButton =
-document.getElementById("publishButton");
 
-const cancelCreateButton =
-document.getElementById("cancelCreateButton");
+    if (!page) return;
+
+
+    event.preventDefault();
+
+
+    openPage(page);
+
+}
+```
+
+);
+
+/* =========================================================
+CREATE POST
+========================================================= */
 
 let selectedFile = null;
+
 let selectedMediaURL = null;
 
-/* OPEN FILE PICKER */
+const fileInput =
+document.getElementById(
+"fileInput"
+);
+
+const uploadButton =
+document.getElementById(
+"uploadButton"
+);
+
+const uploadStep =
+document.querySelector(
+".upload-step"
+);
+
+const editorStep =
+document.querySelector(
+".editor-step"
+);
+
+const previewContainer =
+document.querySelector(
+".editor-preview"
+);
+
+const captionInput =
+document.getElementById(
+"captionInput"
+);
+
+const publishButton =
+document.getElementById(
+"publishButton"
+);
+
+/* OPEN FILE SELECTOR */
 
 if (uploadButton && fileInput) {
 
 ```
-uploadButton.addEventListener("click", function() {
-
-    fileInput.click();
-
-});
-```
-
-}
-
-/* SELECT FILE */
-
-if (fileInput) {
-
-```
-fileInput.addEventListener("change", function() {
-
-    const file = fileInput.files[0];
-
-    if (!file) return;
-
-    if (
-        !file.type.startsWith("image/") &&
-        !file.type.startsWith("video/")
-    ) {
-
-        alert(
-            "Please select an image or video."
-        );
-
-        fileInput.value = "";
-
-        return;
-    }
-
-
-    selectedFile = file;
-
-    selectedMediaURL =
-        URL.createObjectURL(file);
-
-
-    if (uploadStep) {
-
-        uploadStep.classList.add("hidden");
-
-    }
-
-    if (editorStep) {
-
-        editorStep.classList.remove("hidden");
-
-    }
-
-
-    if (previewContainer) {
-
-        previewContainer.innerHTML = "";
-
-        if (file.type.startsWith("video/")) {
-
-            previewContainer.innerHTML = `
-                <video
-                    src="${selectedMediaURL}"
-                    controls
-                    autoplay
-                    muted
-                    playsinline
-                ></video>
-            `;
-
-        } else {
-
-            previewContainer.innerHTML = `
-                <img
-                    src="${selectedMediaURL}"
-                    alt="Preview"
-                >
-            `;
-
-        }
-
-    }
-
-});
-```
-
-}
-
-/* CANCEL CREATE */
-
-if (cancelCreateButton) {
-
-```
-cancelCreateButton.addEventListener(
+uploadButton.addEventListener(
     "click",
-    resetCreate
+    function() {
+
+        fileInput.click();
+
+    }
 );
 ```
 
 }
 
-/* RESET CREATE */
-
-function resetCreate() {
-
-```
-selectedFile = null;
-
-if (selectedMediaURL) {
-
-    URL.revokeObjectURL(
-        selectedMediaURL
-    );
-
-}
-
-selectedMediaURL = null;
-
+/* SELECT IMAGE OR VIDEO */
 
 if (fileInput) {
 
-    fileInput.value = "";
+```
+fileInput.addEventListener(
+    "change",
+    function() {
 
-}
+        const file =
+            fileInput.files[0];
 
-if (captionInput) {
 
-    captionInput.value = "";
+        if (!file) return;
 
-}
 
-if (editorStep) {
+        if (
+            !file.type.startsWith(
+                "image/"
+            ) &&
+            !file.type.startsWith(
+                "video/"
+            )
+        ) {
 
-    editorStep.classList.add("hidden");
+            alert(
+                "Please select an image or video."
+            );
 
-}
+            return;
 
-if (uploadStep) {
+        }
 
-    uploadStep.classList.remove("hidden");
 
-}
+        selectedFile = file;
+
+
+        selectedMediaURL =
+            URL.createObjectURL(
+                file
+            );
+
+
+        if (uploadStep) {
+
+            uploadStep.classList.add(
+                "hidden"
+            );
+
+        }
+
+
+        if (editorStep) {
+
+            editorStep.classList.remove(
+                "hidden"
+            );
+
+        }
+
+
+        if (previewContainer) {
+
+            previewContainer.innerHTML = "";
+
+
+            if (
+                file.type.startsWith(
+                    "video/"
+                )
+            ) {
+
+                previewContainer.innerHTML = `
+
+                    <video
+                        src="${selectedMediaURL}"
+                        controls
+                        autoplay
+                        muted
+                        playsinline>
+                    </video>
+
+                `;
+
+            } else {
+
+                previewContainer.innerHTML = `
+
+                    <img
+                        src="${selectedMediaURL}"
+                        alt="Selected photo">
+
+                `;
+
+            }
+
+        }
+
+    }
+);
 ```
 
 }
 
-/* PUBLISH */
+/* =========================================================
+PUBLISH POST
+========================================================= */
 
 if (publishButton) {
 
@@ -668,6 +345,7 @@ publishButton.addEventListener(
             );
 
             return;
+
         }
 
 
@@ -675,65 +353,69 @@ publishButton.addEventListener(
             new FileReader();
 
 
-        reader.onload = function(event) {
+        reader.onload =
+            function(event) {
 
-            const media =
-                event.target.result;
+                const post = {
+
+                    id:
+                        Date.now().toString(),
+
+                    username:
+                        currentUser.username,
+
+                    name:
+                        currentUser.name,
+
+                    media:
+                        event.target.result,
+
+                    type:
+                        selectedFile.type
+                            .startsWith(
+                                "video/"
+                            )
+                            ? "video"
+                            : "image",
+
+                    caption:
+                        captionInput
+                            ? captionInput.value
+                                .trim()
+                            : "",
+
+                    likes: 0,
+
+                    liked: false,
+
+                    saved: false,
+
+                    comments: [],
+
+                    time: "Just now",
+
+                    createdAt:
+                        Date.now()
+
+                };
 
 
-            const newPost = {
+                posts.push(post);
 
-                id: generateID(),
+                savePosts();
 
-                username:
-                    currentUser.username,
 
-                name:
-                    currentUser.name,
+                resetCreate();
 
-                media: media,
 
-                type:
-                    selectedFile.type.startsWith(
-                        "video/"
-                    )
-                        ? "video"
-                        : "image",
+                alert(
+                    "Your post has been published!"
+                );
 
-                caption:
-                    captionInput
-                        ? captionInput.value.trim()
-                        : "",
 
-                likes: 0,
-
-                liked: false,
-
-                saved: false,
-
-                comments: [],
-
-                time: "Just now",
-
-                createdAt:
-                    Date.now()
+                openPage("home");
 
             };
-
-
-            posts.push(newPost);
-
-            savePosts();
-
-            resetCreate();
-
-            showPage("home");
-
-            alert(
-                "Your post has been published!"
-            );
-
-        };
 
 
         reader.readAsDataURL(
@@ -746,34 +428,306 @@ publishButton.addEventListener(
 
 }
 
-/* ================= PROFILE ================= */
+/* =========================================================
+RESET CREATE PAGE
+========================================================= */
+
+function resetCreate() {
+
+```
+selectedFile = null;
+
+
+if (selectedMediaURL) {
+
+    URL.revokeObjectURL(
+        selectedMediaURL
+    );
+
+}
+
+
+selectedMediaURL = null;
+
+
+if (fileInput) {
+
+    fileInput.value = "";
+
+}
+
+
+if (captionInput) {
+
+    captionInput.value = "";
+
+}
+
+
+if (previewContainer) {
+
+    previewContainer.innerHTML = "";
+
+}
+
+
+if (editorStep) {
+
+    editorStep.classList.add(
+        "hidden"
+    );
+
+}
+
+
+if (uploadStep) {
+
+    uploadStep.classList.remove(
+        "hidden"
+    );
+
+}
+```
+
+}
+
+/* =========================================================
+FEED
+========================================================= */
+
+function renderFeed() {
+
+```
+const feed =
+    document.querySelector(
+        ".feed"
+    );
+
+
+if (!feed) return;
+
+
+feed.innerHTML = "";
+
+
+if (posts.length === 0) {
+
+    feed.innerHTML = `
+
+        <article class="post">
+
+            <div class="post-header">
+
+                <div class="user-avatar">
+                    KG
+                </div>
+
+                <div class="post-user">
+
+                    <strong>
+                        kenyagram
+                    </strong>
+
+                    <span>
+                        Welcome to Kenyagram
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="post-media welcome-media">
+
+                <div class="welcome-logo">
+                    K
+                </div>
+
+                <h2>
+                    Welcome to Kenyagram
+                </h2>
+
+                <p>
+                    Share your first photo or video.
+                </p>
+
+            </div>
+
+        </article>
+
+    `;
+
+    return;
+
+}
+
+
+posts
+    .slice()
+    .reverse()
+    .forEach(function(post) {
+
+        const article =
+            document.createElement(
+                "article"
+            );
+
+
+        article.className =
+            "post";
+
+
+        article.innerHTML = `
+
+            <div class="post-header">
+
+                <div class="user-avatar">
+                    KG
+                </div>
+
+                <div class="post-user">
+
+                    <strong>
+                        ${post.username}
+                    </strong>
+
+                    <span>
+                        ${post.time}
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="post-media">
+
+                ${
+                    post.type === "video"
+
+                    ? `
+
+                        <video
+                            src="${post.media}"
+                            controls
+                            playsinline>
+                        </video>
+
+                      `
+
+                    : `
+
+                        <img
+                            src="${post.media}"
+                            alt="Kenyagram post">
+
+                      `
+                }
+
+            </div>
+
+
+            <div class="post-actions">
+
+                <div class="left-actions">
+
+                    <button
+                        class="action-btn">
+                        ♡
+                    </button>
+
+                    <button
+                        class="action-btn">
+                        💬
+                    </button>
+
+                    <button
+                        class="action-btn">
+                        ➤
+                    </button>
+
+                </div>
+
+
+                <button
+                    class="action-btn">
+                    🔖
+                </button>
+
+            </div>
+
+
+            <div class="post-info">
+
+                <strong>
+                    ${post.likes} likes
+                </strong>
+
+                <p>
+
+                    <strong>
+                        ${post.username}
+                    </strong>
+
+                    ${post.caption}
+
+                </p>
+
+            </div>
+
+        `;
+
+
+        feed.appendChild(
+            article
+        );
+
+    });
+```
+
+}
+
+/* =========================================================
+PROFILE
+========================================================= */
 
 function renderProfile() {
 
 ```
-const profileGrid =
-    document.querySelector(".profile-grid");
+const grid =
+    document.querySelector(
+        ".profile-grid"
+    );
 
-if (!profileGrid) return;
 
-profileGrid.innerHTML = "";
+if (!grid) return;
 
 
 const userPosts =
     posts.filter(
-        post =>
-            post.username ===
-            currentUser.username
+        function(post) {
+
+            return (
+                post.username ===
+                currentUser.username
+            );
+
+        }
     );
+
+
+grid.innerHTML = "";
 
 
 if (userPosts.length === 0) {
 
-    profileGrid.innerHTML = `
+    grid.innerHTML = `
 
         <div class="profile-empty">
 
-            <div>📷</div>
+            <div>
+                📷
+            </div>
 
             <p>
                 You haven't posted anything yet.
@@ -783,8 +737,6 @@ if (userPosts.length === 0) {
 
     `;
 
-    updateProfileStats(0);
-
     return;
 
 }
@@ -793,92 +745,89 @@ if (userPosts.length === 0) {
 userPosts
     .slice()
     .reverse()
-    .forEach(post => {
+    .forEach(function(post) {
 
         const item =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
+
 
         item.className =
             "profile-grid-item";
 
 
-        if (post.type === "video") {
+        if (
+            post.type === "video"
+        ) {
 
             item.innerHTML = `
+
                 <video
                     src="${post.media}"
                     muted
-                    playsinline
-                ></video>
+                    playsinline>
+                </video>
+
             `;
 
         } else {
 
             item.innerHTML = `
+
                 <img
                     src="${post.media}"
-                    alt="Post"
-                >
+                    alt="Post">
+
             `;
 
         }
 
 
-        profileGrid.appendChild(item);
+        grid.appendChild(
+            item
+        );
 
     });
-
-
-updateProfileStats(
-    userPosts.length
-);
 ```
 
 }
 
-/* PROFILE STATS */
-
-function updateProfileStats(postCount) {
-
-```
-const postStat =
-    document.querySelector(
-        "[data-post-count]"
-    );
-
-if (postStat) {
-
-    postStat.textContent =
-        postCount;
-
-}
-```
-
-}
-
-/* ================= REELS ================= */
+/* =========================================================
+REELS
+========================================================= */
 
 function renderReels() {
 
 ```
-const reelsContainer =
+const container =
     document.querySelector(
         ".reels-container"
     );
 
-if (!reelsContainer) return;
+
+if (!container) return;
 
 
 const reels =
     posts.filter(
-        post =>
-            post.type === "video"
+        function(post) {
+
+            return (
+                post.type ===
+                "video"
+            );
+
+        }
     );
+
+
+container.innerHTML = "";
 
 
 if (reels.length === 0) {
 
-    reelsContainer.innerHTML = `
+    container.innerHTML = `
 
         <div class="empty-state">
 
@@ -896,9 +845,10 @@ if (reels.length === 0) {
 
             <button
                 class="primary-button"
-                data-page="create"
-            >
+                data-page="create">
+
                 Create Reel
+
             </button>
 
         </div>
@@ -910,18 +860,19 @@ if (reels.length === 0) {
 }
 
 
-reelsContainer.innerHTML = "";
-
-
 reels
     .slice()
     .reverse()
-    .forEach(post => {
+    .forEach(function(post) {
 
         const reel =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
-        reel.className = "post";
+
+        reel.className =
+            "post";
 
 
         reel.innerHTML = `
@@ -929,19 +880,13 @@ reels
             <div class="post-header">
 
                 <div class="user-avatar">
-                    ${escapeHTML(
-                        post.username
-                            .slice(0, 2)
-                            .toUpperCase()
-                    )}
+                    KG
                 </div>
 
                 <div class="post-user">
 
                     <strong>
-                        ${escapeHTML(
-                            post.username
-                        )}
+                        ${post.username}
                     </strong>
 
                 </div>
@@ -954,26 +899,16 @@ reels
                 <video
                     src="${post.media}"
                     controls
-                    playsinline
-                    style="width:100%;max-height:750px;"
-                ></video>
+                    playsinline>
+                </video>
 
             </div>
 
 
             <div class="post-info">
 
-                <strong>
-                    ${formatNumber(
-                        post.likes || 0
-                    )}
-                    likes
-                </strong>
-
                 <p>
-                    ${escapeHTML(
-                        post.caption || ""
-                    )}
+                    ${post.caption}
                 </p>
 
             </div>
@@ -981,525 +916,74 @@ reels
         `;
 
 
-        reelsContainer.appendChild(reel);
+        container.appendChild(
+            reel
+        );
 
     });
 ```
 
 }
 
-/* ================= SEARCH ================= */
-
-const searchInput =
-document.querySelector(
-".search-box input"
-);
-
-if (searchInput) {
-
-```
-searchInput.addEventListener(
-    "input",
-    function() {
-
-        const query =
-            searchInput.value
-                .trim()
-                .toLowerCase();
-
-
-        const results =
-            document.querySelector(
-                ".search-results"
-            );
-
-
-        if (!results) return;
-
-
-        if (!query) {
-
-            results.innerHTML = "";
-
-            return;
-
-        }
-
-
-        const usernames = [
-            "kenyagram",
-            "football",
-            "messi",
-            "manchestercity"
-        ];
-
-
-        const filtered =
-            usernames.filter(
-                username =>
-                    username
-                        .toLowerCase()
-                        .includes(query)
-            );
-
-
-        results.innerHTML =
-            filtered.map(
-                username => `
-
-                    <div class="search-user">
-
-                        <div class="user-avatar">
-                            ${username
-                                .slice(0,2)
-                                .toUpperCase()}
-                        </div>
-
-                        <div>
-
-                            <strong>
-                                ${escapeHTML(
-                                    username
-                                )}
-                            </strong>
-
-                            <p>
-                                Kenyagram user
-                            </p>
-
-                        </div>
-
-                        <button>
-                            Follow
-                        </button>
-
-                    </div>
-
-                `
-            ).join("");
-
-    }
-);
-```
-
-}
-
-/* ================= MODAL COMMENTS ================= */
-
-const commentModal =
-document.querySelector(".modal");
-
-const commentsList =
-document.querySelector(".comments-list");
-
-const modalClose =
-document.querySelector(".modal-close");
-
-function closeCommentModal() {
-
-```
-if (commentModal) {
-
-    commentModal.classList.remove(
-        "show"
-    );
-
-}
-```
-
-}
-
-if (modalClose) {
-
-```
-modalClose.addEventListener(
-    "click",
-    closeCommentModal
-);
-```
-
-}
-
-if (commentModal) {
-
-```
-commentModal.addEventListener(
-    "click",
-    function(event) {
-
-        if (
-            event.target ===
-            commentModal
-        ) {
-
-            closeCommentModal();
-
-        }
-
-    }
-);
-```
-
-}
-
-/* ================= INITIALIZE ================= */
+/* =========================================================
+START WEBSITE
+========================================================= */
 
 document.addEventListener(
 "DOMContentLoaded",
 function() {
 
 ```
+    /*
+     * IMPORTANT:
+     * Home is the first page shown.
+     */
+
+    const allPages =
+        document.querySelectorAll(
+            ".page"
+        );
+
+
+    allPages.forEach(
+        function(page) {
+
+            page.style.display =
+                "none";
+
+            page.classList.remove(
+                "active-page"
+            );
+
+        }
+    );
+
+
+    const home =
+        document.getElementById(
+            "home"
+        );
+
+
+    if (home) {
+
+        home.style.display =
+            "block";
+
+        home.classList.add(
+            "active-page"
+        );
+
+    }
+
+
     renderFeed();
 
     renderProfile();
 
     renderReels();
 
-    showPage("home");
-
 }
 ```
 
 );
-/* =========================================================
-   KENYAGRAM - NAVIGATION FIX
-   Makes sidebar icons clickable
-   ========================================================= */
-
-document.addEventListener("DOMContentLoaded", function () {
-
-    // Page names and the words/icons used in the navigation
-    const navigationMap = {
-        "home": ["home"],
-        "search": ["search"],
-        "reels": ["reels"],
-        "messages": ["messages", "message"],
-        "create": ["create"],
-        "profile": ["profile"],
-        "settings": ["settings"]
-    };
-
-    // Find all possible navigation buttons
-    const buttons = document.querySelectorAll(
-        ".nav-item, .mobile-nav button, [data-page]"
-    );
-
-    buttons.forEach(function (button) {
-
-        // If the button already has data-page, leave it alone
-        if (button.dataset.page) return;
-
-        const text = button.textContent
-            .trim()
-            .toLowerCase();
-
-        // Find which page this button should open
-        for (const [page, names] of Object.entries(navigationMap)) {
-
-            const matches = names.some(function (name) {
-                return text.includes(name);
-            });
-
-            if (matches) {
-
-                button.dataset.page = page;
-
-                button.addEventListener("click", function (event) {
-
-                    event.preventDefault();
-
-                    openKenyagramPage(page);
-
-                });
-
-                break;
-            }
-        }
-    });
-
-});
-
-
-/* ================= OPEN PAGE ================= */
-
-function openKenyagramPage(pageName) {
-
-    // Hide every page
-    const pages = document.querySelectorAll(".page");
-
-    pages.forEach(function (page) {
-        page.classList.remove("active-page");
-        page.style.display = "none";
-    });
-
-
-    // Find requested page
-    const page = document.getElementById(pageName);
-
-    if (!page) {
-
-        console.warn(
-            "Kenyagram page not found:",
-            pageName
-        );
-
-        return;
-    }
-
-
-    // Show requested page
-    page.classList.add("active-page");
-    page.style.display = "block";
-
-
-    // Update active sidebar icon
-    const navigationButtons =
-        document.querySelectorAll(
-            ".nav-item, .mobile-nav button, [data-page]"
-        );
-
-    navigationButtons.forEach(function (button) {
-
-        button.classList.remove("active");
-
-        if (button.dataset.page === pageName) {
-            button.classList.add("active");
-        }
-
-    });
-
-
-    // Refresh page content when needed
-    if (pageName === "home" &&
-        typeof renderFeed === "function") {
-
-        renderFeed();
-
-    }
-
-    if (pageName === "profile" &&
-        typeof renderProfile === "function") {
-
-        renderProfile();
-
-    }
-
-    if (pageName === "reels" &&
-        typeof renderReels === "function") {
-
-        renderReels();
-
-    }
-
-    // Go to top
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
-
-}
-
-
-/* =========================================================
-   DIRECT NAVIGATION
-   ========================================================= */
-
-document.addEventListener("click", function (event) {
-
-    const button =
-        event.target.closest(
-            ".nav-item, .mobile-nav button, [data-page]"
-        );
-
-    if (!button) return;
-
-    const page =
-        button.dataset.page;
-
-    if (!page) return;
-
-    event.preventDefault();
-
-    openKenyagramPage(page);
-
-});
-/* =========================================================
-KENYAGRAM READY
-========================================================= */
-const fileInput = document.getElementById("fileInput");
-const uploadButton = document.getElementById("uploadButton");
-const uploadStep = document.querySelector(".upload-step");
-const editorStep = document.querySelector(".editor-step");
-const previewContainer = document.querySelector(".editor-preview");
-const captionInput = document.getElementById("captionInput");
-const publishButton = document.getElementById("publishButton");
-
-let selectedFile = null;
-let selectedMediaURL = null;
-
-
-// OPEN DEVICE FILE PICKER
-
-if (uploadButton && fileInput) {
-
-    uploadButton.addEventListener("click", function () {
-        fileInput.click();
-    });
-
-}
-
-
-// WHEN PHOTO/VIDEO IS SELECTED
-
-if (fileInput) {
-
-    fileInput.addEventListener("change", function () {
-
-        const file = fileInput.files[0];
-
-        if (!file) return;
-
-
-        if (
-            !file.type.startsWith("image/") &&
-            !file.type.startsWith("video/")
-        ) {
-
-            alert("Please select a photo or video.");
-
-            fileInput.value = "";
-
-            return;
-        }
-
-
-        selectedFile = file;
-
-        selectedMediaURL =
-            URL.createObjectURL(file);
-
-
-        uploadStep.classList.add("hidden");
-
-        editorStep.classList.remove("hidden");
-
-
-        previewContainer.innerHTML = "";
-
-
-        if (file.type.startsWith("video/")) {
-
-            previewContainer.innerHTML = `
-                <video
-                    src="${selectedMediaURL}"
-                    controls
-                    autoplay
-                    muted
-                    playsinline>
-                </video>
-            `;
-
-        } else {
-
-            previewContainer.innerHTML = `
-                <img
-                    src="${selectedMediaURL}"
-                    alt="Selected photo">
-            `;
-
-        }
-
-    });
-
-}
-
-
-// PUBLISH POST
-
-if (publishButton) {
-
-    publishButton.addEventListener("click", function () {
-
-        if (!selectedFile) {
-
-            alert("Choose a photo or video first.");
-
-            return;
-        }
-
-
-        const reader = new FileReader();
-
-
-        reader.onload = function (event) {
-
-            const newPost = {
-
-                id: Date.now().toString(),
-
-                username: "kenyagram_user",
-
-                media: event.target.result,
-
-                type:
-                    selectedFile.type.startsWith("video/")
-                        ? "video"
-                        : "image",
-
-                caption:
-                    captionInput.value.trim(),
-
-                likes: 0,
-
-                liked: false,
-
-                saved: false,
-
-                comments: [],
-
-                time: "Just now",
-
-                createdAt: Date.now()
-
-            };
-
-
-            posts.push(newPost);
-
-            savePosts();
-
-
-            alert("Your post has been published!");
-
-
-            // Return to home
-
-            if (typeof showPage === "function") {
-
-                showPage("home");
-
-            }
-
-
-            // Reset
-
-            fileInput.value = "";
-
-            captionInput.value = "";
-
-            selectedFile = null;
-
-            previewContainer.innerHTML = "";
-
-            editorStep.classList.add("hidden");
-
-            uploadStep.classList.remove("hidden");
-
-        };
-
-
-        reader.readAsDataURL(selectedFile);
-
-    });
-
-}
