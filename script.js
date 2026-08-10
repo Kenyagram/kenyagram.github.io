@@ -1161,7 +1161,168 @@ function() {
 ```
 
 );
+/* =========================================================
+   KENYAGRAM - NAVIGATION FIX
+   Makes sidebar icons clickable
+   ========================================================= */
 
+document.addEventListener("DOMContentLoaded", function () {
+
+    // Page names and the words/icons used in the navigation
+    const navigationMap = {
+        "home": ["home"],
+        "search": ["search"],
+        "reels": ["reels"],
+        "messages": ["messages", "message"],
+        "create": ["create"],
+        "profile": ["profile"],
+        "settings": ["settings"]
+    };
+
+    // Find all possible navigation buttons
+    const buttons = document.querySelectorAll(
+        ".nav-item, .mobile-nav button, [data-page]"
+    );
+
+    buttons.forEach(function (button) {
+
+        // If the button already has data-page, leave it alone
+        if (button.dataset.page) return;
+
+        const text = button.textContent
+            .trim()
+            .toLowerCase();
+
+        // Find which page this button should open
+        for (const [page, names] of Object.entries(navigationMap)) {
+
+            const matches = names.some(function (name) {
+                return text.includes(name);
+            });
+
+            if (matches) {
+
+                button.dataset.page = page;
+
+                button.addEventListener("click", function (event) {
+
+                    event.preventDefault();
+
+                    openKenyagramPage(page);
+
+                });
+
+                break;
+            }
+        }
+    });
+
+});
+
+
+/* ================= OPEN PAGE ================= */
+
+function openKenyagramPage(pageName) {
+
+    // Hide every page
+    const pages = document.querySelectorAll(".page");
+
+    pages.forEach(function (page) {
+        page.classList.remove("active-page");
+        page.style.display = "none";
+    });
+
+
+    // Find requested page
+    const page = document.getElementById(pageName);
+
+    if (!page) {
+
+        console.warn(
+            "Kenyagram page not found:",
+            pageName
+        );
+
+        return;
+    }
+
+
+    // Show requested page
+    page.classList.add("active-page");
+    page.style.display = "block";
+
+
+    // Update active sidebar icon
+    const navigationButtons =
+        document.querySelectorAll(
+            ".nav-item, .mobile-nav button, [data-page]"
+        );
+
+    navigationButtons.forEach(function (button) {
+
+        button.classList.remove("active");
+
+        if (button.dataset.page === pageName) {
+            button.classList.add("active");
+        }
+
+    });
+
+
+    // Refresh page content when needed
+    if (pageName === "home" &&
+        typeof renderFeed === "function") {
+
+        renderFeed();
+
+    }
+
+    if (pageName === "profile" &&
+        typeof renderProfile === "function") {
+
+        renderProfile();
+
+    }
+
+    if (pageName === "reels" &&
+        typeof renderReels === "function") {
+
+        renderReels();
+
+    }
+
+    // Go to top
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+}
+
+
+/* =========================================================
+   DIRECT NAVIGATION
+   ========================================================= */
+
+document.addEventListener("click", function (event) {
+
+    const button =
+        event.target.closest(
+            ".nav-item, .mobile-nav button, [data-page]"
+        );
+
+    if (!button) return;
+
+    const page =
+        button.dataset.page;
+
+    if (!page) return;
+
+    event.preventDefault();
+
+    openKenyagramPage(page);
+
+});
 /* =========================================================
 KENYAGRAM READY
 ========================================================= */
