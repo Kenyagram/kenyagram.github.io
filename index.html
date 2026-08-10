@@ -1,1012 +1,776 @@
-/* =====================================================
-KENYAGRAM - WORKING SCRIPT
-===================================================== */
+<!DOCTYPE html>
 
-/* ================= POSTS ================= */
+<html lang="en">
 
-let posts = JSON.parse(
-localStorage.getItem("kenyagram_posts") || "[]"
-);
-
-function savePosts() {
+<head>
 
 ```
-localStorage.setItem(
-    "kenyagram_posts",
-    JSON.stringify(posts)
-);
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Kenyagram</title>
+
+<link
+    rel="stylesheet"
+    href="style.css"
+>
 ```
 
-}
+</head>
 
-/* ================= PAGE SYSTEM ================= */
+<body>
 
-function showPage(pageName) {
-
-```
-const pages =
-    document.querySelectorAll(".page");
-
-
-pages.forEach(function(page) {
-
-    page.style.display = "none";
-
-    page.classList.remove(
-        "active-page"
-    );
-
-});
-
-
-const page =
-    document.getElementById(pageName);
-
-
-if (!page) {
-
-    console.log(
-        "Page not found:",
-        pageName
-    );
-
-    return;
-
-}
-
-
-page.style.display = "block";
-
-page.classList.add(
-    "active-page"
-);
-
-
-/* Active button */
-
-const buttons =
-    document.querySelectorAll(
-        ".nav-item, .mobile-nav button"
-    );
-
-
-buttons.forEach(function(button) {
-
-    button.classList.remove(
-        "active"
-    );
-
-
-    if (
-        button.getAttribute(
-            "data-page"
-        ) === pageName
-    ) {
-
-        button.classList.add(
-            "active"
-        );
-
-    }
-
-});
-
-
-window.scrollTo(
-    0,
-    0
-);
-
-
-/* Refresh pages */
-
-if (
-    pageName === "home"
-) {
-
-    renderFeed();
-
-}
-
-
-if (
-    pageName === "profile"
-) {
-
-    renderProfile();
-
-}
-
-
-if (
-    pageName === "reels"
-) {
-
-    renderReels();
-
-}
-```
-
-}
-
-/* ================= NAVIGATION ================= */
-
-/*
-These are the buttons on the left side.
-*/
-
-document.addEventListener(
-"click",
-function(event) {
+<div class="app">
 
 ```
-    const button =
-        event.target.closest(
-            ".nav-item"
-        );
+<!-- ================= SIDEBAR ================= -->
 
+<aside class="sidebar">
 
-    if (!button) return;
+    <div class="brand">
+        <span class="brand-full">Kenyagram</span>
+        <span class="brand-mini">K</span>
+    </div>
 
 
-    const page =
-        button.getAttribute(
-            "data-page"
-        );
+    <nav class="main-nav">
 
+        <button
+            class="nav-item active"
+            data-page="home"
+        >
+            <span class="nav-icon">⌂</span>
+            <span class="nav-label">Home</span>
+        </button>
 
-    if (!page) return;
 
+        <button
+            class="nav-item"
+            data-page="search"
+        >
+            <span class="nav-icon">⌕</span>
+            <span class="nav-label">Search</span>
+        </button>
 
-    event.preventDefault();
 
+        <button
+            class="nav-item"
+            data-page="reels"
+        >
+            <span class="nav-icon">▶</span>
+            <span class="nav-label">Reels</span>
+        </button>
 
-    showPage(page);
 
-}
-```
+        <button
+            class="nav-item"
+            data-page="messages"
+        >
+            <span class="nav-icon">♡</span>
+            <span class="nav-label">Messages</span>
+        </button>
 
-);
 
-/*
-Mobile navigation
-*/
+        <button
+            class="nav-item"
+            data-page="create"
+        >
+            <span class="nav-icon">＋</span>
+            <span class="nav-label">Create</span>
+        </button>
 
-document.addEventListener(
-"click",
-function(event) {
 
-```
-    const button =
-        event.target.closest(
-            ".mobile-nav button"
-        );
+        <button
+            class="nav-item"
+            data-page="profile"
+        >
+            <span class="nav-icon">◯</span>
+            <span class="nav-label">Profile</span>
+        </button>
 
 
-    if (!button) return;
+        <button
+            class="nav-item"
+            data-page="settings"
+        >
+            <span class="nav-icon">⚙</span>
+            <span class="nav-label">Settings</span>
+        </button>
 
+    </nav>
 
-    const page =
-        button.getAttribute(
-            "data-page"
-        );
 
+    <div class="sidebar-bottom">
 
-    if (!page) return;
+        <button
+            class="nav-item"
+            data-page="settings"
+        >
+            <span class="nav-icon">☰</span>
+            <span class="nav-label">More</span>
+        </button>
 
+    </div>
 
-    event.preventDefault();
+</aside>
 
 
-    showPage(page);
 
-}
-```
+<!-- ================= MAIN ================= -->
 
-);
+<main class="main-content">
 
-/*
-Any button containing data-page.
-*/
 
-document.addEventListener(
-"click",
-function(event) {
+    <!-- MOBILE HEADER -->
 
-```
-    const button =
-        event.target.closest(
-            "[data-page]"
-        );
+    <header class="mobile-header">
 
+        <strong>Kenyagram</strong>
 
-    if (!button) return;
+        <button
+            class="header-create"
+            data-page="create"
+        >
+            ＋
+        </button>
 
+    </header>
 
-    if (
-        button.classList.contains(
-            "nav-item"
-        )
-    ) return;
 
 
-    if (
-        button.closest(
-            ".mobile-nav"
-        )
-    ) return;
+    <!-- ================= HOME ================= -->
 
+    <section
+        id="home"
+        class="page active-page"
+    >
 
-    const page =
-        button.getAttribute(
-            "data-page"
-        );
+        <div class="stories">
 
+            <div class="story">
 
-    if (!page) return;
-
-
-    event.preventDefault();
-
-
-    showPage(page);
-
-}
-```
-
-);
-
-/* ================= CREATE POST ================= */
-
-let selectedFile = null;
-
-let selectedURL = null;
-
-const fileInput =
-document.getElementById(
-"fileInput"
-);
-
-const uploadButton =
-document.getElementById(
-"uploadButton"
-);
-
-const uploadStep =
-document.querySelector(
-".upload-step"
-);
-
-const editorStep =
-document.querySelector(
-".editor-step"
-);
-
-const preview =
-document.querySelector(
-".editor-preview"
-);
-
-const caption =
-document.getElementById(
-"captionInput"
-);
-
-const publishButton =
-document.getElementById(
-"publishButton"
-);
-
-/* Open file picker */
-
-if (
-uploadButton &&
-fileInput
-) {
-
-```
-uploadButton.onclick =
-    function() {
-
-        fileInput.click();
-
-    };
-```
-
-}
-
-/* Choose photo/video */
-
-if (fileInput) {
-
-```
-fileInput.onchange =
-    function() {
-
-        const file =
-            fileInput.files[0];
-
-
-        if (!file) return;
-
-
-        if (
-            !file.type.startsWith(
-                "image/"
-            ) &&
-            !file.type.startsWith(
-                "video/"
-            )
-        ) {
-
-            alert(
-                "Please choose a photo or video."
-            );
-
-            return;
-
-        }
-
-
-        selectedFile =
-            file;
-
-
-        selectedURL =
-            URL.createObjectURL(
-                file
-            );
-
-
-        if (uploadStep) {
-
-            uploadStep.style.display =
-                "none";
-
-        }
-
-
-        if (editorStep) {
-
-            editorStep.style.display =
-                "grid";
-
-        }
-
-
-        if (preview) {
-
-            if (
-                file.type.startsWith(
-                    "video/"
-                )
-            ) {
-
-                preview.innerHTML = `
-
-                    <video
-                        src="${selectedURL}"
-                        controls
-                        autoplay
-                        muted
-                        playsinline>
-                    </video>
-
-                `;
-
-            } else {
-
-                preview.innerHTML = `
-
-                    <img
-                        src="${selectedURL}"
-                        alt="Post preview">
-
-                `;
-
-            }
-
-        }
-
-    };
-```
-
-}
-
-/* Publish */
-
-if (publishButton) {
-
-```
-publishButton.onclick =
-    function() {
-
-        if (!selectedFile) {
-
-            alert(
-                "Choose a photo or video first."
-            );
-
-            return;
-
-        }
-
-
-        const reader =
-            new FileReader();
-
-
-        reader.onload =
-            function(event) {
-
-                const post = {
-
-                    id:
-                        Date.now(),
-
-                    username:
-                        "kenyagram_user",
-
-                    media:
-                        event.target.result,
-
-                    type:
-                        selectedFile.type
-                            .startsWith(
-                                "video/"
-                            )
-                            ? "video"
-                            : "image",
-
-                    caption:
-                        caption
-                            ? caption.value
-                            : "",
-
-                    likes: 0,
-
-                    time:
-                        "Just now"
-
-                };
-
-
-                posts.push(
-                    post
-                );
-
-
-                savePosts();
-
-
-                alert(
-                    "Posted successfully!"
-                );
-
-
-                if (caption) {
-
-                    caption.value =
-                        "";
-
-                }
-
-
-                if (fileInput) {
-
-                    fileInput.value =
-                        "";
-
-                }
-
-
-                if (preview) {
-
-                    preview.innerHTML =
-                        "";
-
-                }
-
-
-                selectedFile =
-                    null;
-
-
-                if (editorStep) {
-
-                    editorStep.style.display =
-                        "none";
-
-                }
-
-
-                if (uploadStep) {
-
-                    uploadStep.style.display =
-                        "flex";
-
-                }
-
-
-                showPage(
-                    "home"
-                );
-
-            };
-
-
-        reader.readAsDataURL(
-            selectedFile
-        );
-
-    };
-```
-
-}
-
-/* ================= FEED ================= */
-
-function renderFeed() {
-
-```
-const feed =
-    document.querySelector(
-        ".feed"
-    );
-
-
-if (!feed) return;
-
-
-feed.innerHTML = "";
-
-
-if (posts.length === 0) {
-
-    feed.innerHTML = `
-
-        <article class="post">
-
-            <div class="post-header">
-
-                <div class="user-avatar">
-                    KG
+                <div class="story-avatar own-story">
+                    ＋
                 </div>
 
-                <div class="post-user">
-
-                    <strong>
-                        kenyagram
-                    </strong>
-
-                    <span>
-                        Welcome
-                    </span>
-
-                </div>
+                <span>Your story</span>
 
             </div>
 
 
-            <div class="post-media welcome-media">
+            <div class="story">
 
-                <div class="welcome-logo">
-                    K
+                <div class="story-ring">
+
+                    <div class="story-avatar">
+                        KG
+                    </div>
+
                 </div>
 
-                <h2>
-                    Welcome to Kenyagram
-                </h2>
-
-                <p>
-                    Create your first post.
-                </p>
+                <span>Kenyagram</span>
 
             </div>
 
-        </article>
 
-    `;
+            <div class="story">
 
-    return;
+                <div class="story-ring">
 
-}
+                    <div class="story-avatar">
+                        ⚽
+                    </div>
 
+                </div>
 
-posts
-    .slice()
-    .reverse()
-    .forEach(
-        function(post) {
+                <span>Football</span>
 
-            const article =
-                document.createElement(
-                    "article"
-                );
+            </div>
 
 
-            article.className =
-                "post";
+            <div class="story">
+
+                <div class="story-ring">
+
+                    <div class="story-avatar">
+                        ⭐
+                    </div>
+
+                </div>
+
+                <span>Popular</span>
+
+            </div>
+
+        </div>
 
 
-            let media;
+        <div class="feed"></div>
+
+    </section>
 
 
-            if (
-                post.type ===
-                "video"
-            ) {
 
-                media = `
+    <!-- ================= SEARCH ================= -->
 
-                    <video
-                        src="${post.media}"
-                        controls
-                        playsinline>
-                    </video>
+    <section
+        id="search"
+        class="page"
+    >
 
-                `;
+        <div class="page-title">
 
-            } else {
+            <h1>Search</h1>
 
-                media = `
-
-                    <img
-                        src="${post.media}"
-                        alt="Kenyagram post">
-
-                `;
-
-            }
+        </div>
 
 
-            article.innerHTML = `
+        <div class="search-box">
 
-                <div class="post-header">
+            <span>⌕</span>
+
+            <input
+                id="searchInput"
+                type="text"
+                placeholder="Search"
+            >
+
+        </div>
+
+
+        <div
+            class="search-results"
+            id="searchResults"
+        ></div>
+
+    </section>
+
+
+
+    <!-- ================= REELS ================= -->
+
+    <section
+        id="reels"
+        class="page"
+    >
+
+        <div class="page-title">
+
+            <h1>Reels</h1>
+
+        </div>
+
+
+        <div class="reels-container"></div>
+
+    </section>
+
+
+
+    <!-- ================= MESSAGES ================= -->
+
+    <section
+        id="messages"
+        class="page"
+    >
+
+        <div class="messages-layout">
+
+            <div class="conversation-list">
+
+                <div class="messages-header">
+
+                    <h2>Messages</h2>
+
+                    <button>＋</button>
+
+                </div>
+
+
+                <div class="message-search">
+
+                    <input
+                        type="text"
+                        placeholder="Search messages"
+                    >
+
+                </div>
+
+
+                <div class="conversation">
 
                     <div class="user-avatar">
                         KG
                     </div>
 
-                    <div class="post-user">
+                    <div>
 
-                        <strong>
-                            ${post.username}
-                        </strong>
+                        <strong>Kenyagram</strong>
+
+                        <p>
+                            Welcome to Kenyagram
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="chat-area">
+
+                <div class="chat-empty">
+
+                    <div class="chat-icon">
+                        ✉
+                    </div>
+
+                    <h2>
+                        Your messages
+                    </h2>
+
+                    <p>
+                        Send private messages to other users.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ================= CREATE ================= -->
+
+    <section
+        id="create"
+        class="page"
+    >
+
+        <div class="create-page">
+
+            <div class="create-card">
+
+
+                <div class="create-title">
+
+                    <button
+                        type="button"
+                        id="cancelCreateButton"
+                    >
+                        ×
+                    </button>
+
+                    <h2>
+                        Create new post
+                    </h2>
+
+                    <div></div>
+
+                </div>
+
+
+
+                <div class="create-content">
+
+
+                    <!-- UPLOAD -->
+
+                    <div class="upload-step">
+
+                        <div class="upload-icon">
+                            📷
+                        </div>
+
+                        <h2>
+                            Create a new post
+                        </h2>
+
+                        <p>
+                            Choose a photo or video from your device
+                        </p>
+
+
+                        <input
+                            type="file"
+                            id="fileInput"
+                            accept="image/*,video/*"
+                            hidden
+                        >
+
+
+                        <button
+                            type="button"
+                            id="uploadButton"
+                            class="primary-button"
+                        >
+                            Select from device
+                        </button>
+
+                    </div>
+
+
+
+                    <!-- EDITOR -->
+
+                    <div
+                        class="editor-step hidden"
+                    >
+
+                        <div class="editor-preview"></div>
+
+
+                        <div class="editor-details">
+
+                            <div class="editor-user">
+
+                                <div class="user-avatar">
+                                    KG
+                                </div>
+
+                                <strong>
+                                    kenyagram_user
+                                </strong>
+
+                            </div>
+
+
+                            <textarea
+                                id="captionInput"
+                                placeholder="Write a caption..."
+                                maxlength="2200"
+                            ></textarea>
+
+
+                            <div class="editor-actions">
+
+                                <button
+                                    type="button"
+                                    id="cancelCreateButton2"
+                                    class="secondary-button"
+                                >
+                                    Cancel
+                                </button>
+
+
+                                <button
+                                    type="button"
+                                    id="publishButton"
+                                    class="primary-button"
+                                >
+                                    Share
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ================= PROFILE ================= -->
+
+    <section
+        id="profile"
+        class="page"
+    >
+
+        <div class="profile-container">
+
+
+            <div class="profile-header">
+
+
+                <div class="profile-picture">
+                    KG
+                </div>
+
+
+                <div class="profile-details">
+
+
+                    <div class="profile-name-row">
+
+                        <h2>
+                            kenyagram_user
+                        </h2>
+
+                        <button
+                            class="secondary-button"
+                        >
+                            Edit profile
+                        </button>
+
+                        <button
+                            class="profile-settings"
+                            data-page="settings"
+                        >
+                            ⚙
+                        </button>
+
+                    </div>
+
+
+                    <div class="profile-stats">
 
                         <span>
-                            ${post.time}
+                            <strong data-post-count>
+                                0
+                            </strong>
+                            posts
+                        </span>
+
+                        <span>
+                            <strong>
+                                0
+                            </strong>
+                            followers
+                        </span>
+
+                        <span>
+                            <strong>
+                                0
+                            </strong>
+                            following
                         </span>
 
                     </div>
 
-                </div>
 
-
-                <div class="post-media">
-
-                    ${media}
-
-                </div>
-
-
-                <div class="post-actions">
-
-                    <div class="left-actions">
-
-                        <button class="action-btn">
-                            ♡
-                        </button>
-
-                        <button class="action-btn">
-                            💬
-                        </button>
-
-                        <button class="action-btn">
-                            ➤
-                        </button>
-
-                    </div>
-
-
-                    <button class="action-btn">
-                        🔖
-                    </button>
-
-                </div>
-
-
-                <div class="post-info">
-
-                    <strong>
-                        ${post.likes} likes
-                    </strong>
-
-                    <p>
+                    <div class="profile-bio">
 
                         <strong>
-                            ${post.username}
+                            Kenyagram User
                         </strong>
 
-                        ${post.caption}
+                        <p>
+                            Welcome to my Kenyagram profile.
+                        </p>
 
-                    </p>
+                    </div>
+
 
                 </div>
 
-            `;
-
-
-            feed.appendChild(
-                article
-            );
-
-        }
-    );
-```
-
-}
-
-/* ================= PROFILE ================= */
-
-function renderProfile() {
-
-```
-const grid =
-    document.querySelector(
-        ".profile-grid"
-    );
-
-
-if (!grid) return;
-
-
-const myPosts =
-    posts.filter(
-        function(post) {
-
-            return (
-                post.username ===
-                "kenyagram_user"
-            );
-
-        }
-    );
-
-
-grid.innerHTML = "";
-
-
-if (
-    myPosts.length === 0
-) {
-
-    grid.innerHTML = `
-
-        <div class="profile-empty">
-
-            <div>
-                📷
             </div>
 
-            <p>
-                No posts yet.
-            </p>
+
+
+            <div class="profile-tabs">
+
+                <button class="active">
+                    ▦ POSTS
+                </button>
+
+                <button>
+                    ▶ REELS
+                </button>
+
+                <button>
+                    🔖 SAVED
+                </button>
+
+            </div>
+
+
+            <div class="profile-grid"></div>
+
 
         </div>
 
-    `;
-
-    return;
-
-}
+    </section>
 
 
-myPosts
-    .slice()
-    .reverse()
-    .forEach(
-        function(post) {
 
-            const item =
-                document.createElement(
-                    "div"
-                );
+    <!-- ================= SETTINGS ================= -->
 
+    <section
+        id="settings"
+        class="page"
+    >
 
-            item.className =
-                "profile-grid-item";
+        <div class="settings-container">
 
-
-            if (
-                post.type ===
-                "video"
-            ) {
-
-                item.innerHTML = `
-
-                    <video
-                        src="${post.media}"
-                        muted>
-                    </video>
-
-                `;
-
-            } else {
-
-                item.innerHTML = `
-
-                    <img
-                        src="${post.media}"
-                        alt="Post">
-
-                `;
-
-            }
+            <h1>
+                Settings
+            </h1>
 
 
-            grid.appendChild(
-                item
-            );
-
-        }
-    );
-```
-
-}
-
-/* ================= REELS ================= */
-
-function renderReels() {
-
-```
-const container =
-    document.querySelector(
-        ".reels-container"
-    );
+            <div class="settings-card">
 
 
-if (!container) return;
+                <button>
 
+                    ⚙
 
-const videos =
-    posts.filter(
-        function(post) {
-
-            return (
-                post.type ===
-                "video"
-            );
-
-        }
-    );
-
-
-container.innerHTML = "";
-
-
-if (
-    videos.length === 0
-) {
-
-    container.innerHTML = `
-
-        <div class="empty-state">
-
-            <div class="empty-icon">
-                ▶
-            </div>
-
-            <h2>
-                No Reels Yet
-            </h2>
-
-            <p>
-                Upload a video to create your first Reel.
-            </p>
-
-            <button
-                class="primary-button"
-                data-page="create">
-
-                Create Reel
-
-            </button>
-
-        </div>
-
-    `;
-
-    return;
-
-}
-
-
-videos
-    .slice()
-    .reverse()
-    .forEach(
-        function(post) {
-
-            const reel =
-                document.createElement(
-                    "div"
-                );
-
-
-            reel.className =
-                "post";
-
-
-            reel.innerHTML = `
-
-                <div class="post-header">
-
-                    <div class="user-avatar">
-                        KG
-                    </div>
-
-                    <div class="post-user">
+                    <div>
 
                         <strong>
-                            ${post.username}
+                            Account
+                        </strong>
+
+                        <p>
+                            Manage your account
+                        </p>
+
+                    </div>
+
+                    ›
+
+                </button>
+
+
+                <button>
+
+                    🔒
+
+                    <div>
+
+                        <strong>
+                            Privacy
+                        </strong>
+
+                        <p>
+                            Control your privacy
+                        </p>
+
+                    </div>
+
+                    ›
+
+                </button>
+
+
+                <button>
+
+                    🔔
+
+                    <div>
+
+                        <strong>
+                            Notifications
+                        </strong>
+
+                        <p>
+                            Manage notifications
+                        </p>
+
+                    </div>
+
+                    ›
+
+                </button>
+
+
+                <button>
+
+                    ❓
+
+                    <div>
+
+                        <strong>
+                            Help
+                        </strong>
+
+                        <p>
+                            Get help with Kenyagram
+                        </p>
+
+                    </div>
+
+                    ›
+
+                </button>
+
+
+                <button class="danger-setting">
+
+                    🚪
+
+                    <div>
+
+                        <strong>
+                            Log out
                         </strong>
 
                     </div>
 
-                </div>
+                    ›
+
+                </button>
 
 
-                <div class="post-media">
+            </div>
 
-                    <video
-                        src="${post.media}"
-                        controls
-                        playsinline>
-                    </video>
+        </div>
 
-                </div>
+    </section>
 
 
-                <div class="post-info">
-
-                    <p>
-                        ${post.caption}
-                    </p>
-
-                </div>
-
-            `;
+</main>
 
 
-            container.appendChild(
-                reel
-            );
 
-        }
-    );
+<!-- ================= MOBILE NAV ================= -->
+
+<nav class="mobile-nav">
+
+    <button
+        data-page="home"
+    >
+        ⌂
+    </button>
+
+    <button
+        data-page="search"
+    >
+        ⌕
+    </button>
+
+    <button
+        data-page="reels"
+    >
+        ▶
+    </button>
+
+    <button
+        data-page="create"
+    >
+        ＋
+    </button>
+
+    <button
+        data-page="profile"
+    >
+        ◯
+    </button>
+
+</nav>
 ```
 
-}
+</div>
 
-/* ================= START ================= */
+<script
+    src="script.js"
+></script>
 
-document.addEventListener(
-"DOMContentLoaded",
-function() {
+</body>
 
-```
-    showPage(
-        "home"
-    );
-
-    renderFeed();
-
-    renderProfile();
-
-    renderReels();
-
-}
-```
-
-);
+</html>
