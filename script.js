@@ -1326,3 +1326,180 @@ document.addEventListener("click", function (event) {
 /* =========================================================
 KENYAGRAM READY
 ========================================================= */
+const fileInput = document.getElementById("fileInput");
+const uploadButton = document.getElementById("uploadButton");
+const uploadStep = document.querySelector(".upload-step");
+const editorStep = document.querySelector(".editor-step");
+const previewContainer = document.querySelector(".editor-preview");
+const captionInput = document.getElementById("captionInput");
+const publishButton = document.getElementById("publishButton");
+
+let selectedFile = null;
+let selectedMediaURL = null;
+
+
+// OPEN DEVICE FILE PICKER
+
+if (uploadButton && fileInput) {
+
+    uploadButton.addEventListener("click", function () {
+        fileInput.click();
+    });
+
+}
+
+
+// WHEN PHOTO/VIDEO IS SELECTED
+
+if (fileInput) {
+
+    fileInput.addEventListener("change", function () {
+
+        const file = fileInput.files[0];
+
+        if (!file) return;
+
+
+        if (
+            !file.type.startsWith("image/") &&
+            !file.type.startsWith("video/")
+        ) {
+
+            alert("Please select a photo or video.");
+
+            fileInput.value = "";
+
+            return;
+        }
+
+
+        selectedFile = file;
+
+        selectedMediaURL =
+            URL.createObjectURL(file);
+
+
+        uploadStep.classList.add("hidden");
+
+        editorStep.classList.remove("hidden");
+
+
+        previewContainer.innerHTML = "";
+
+
+        if (file.type.startsWith("video/")) {
+
+            previewContainer.innerHTML = `
+                <video
+                    src="${selectedMediaURL}"
+                    controls
+                    autoplay
+                    muted
+                    playsinline>
+                </video>
+            `;
+
+        } else {
+
+            previewContainer.innerHTML = `
+                <img
+                    src="${selectedMediaURL}"
+                    alt="Selected photo">
+            `;
+
+        }
+
+    });
+
+}
+
+
+// PUBLISH POST
+
+if (publishButton) {
+
+    publishButton.addEventListener("click", function () {
+
+        if (!selectedFile) {
+
+            alert("Choose a photo or video first.");
+
+            return;
+        }
+
+
+        const reader = new FileReader();
+
+
+        reader.onload = function (event) {
+
+            const newPost = {
+
+                id: Date.now().toString(),
+
+                username: "kenyagram_user",
+
+                media: event.target.result,
+
+                type:
+                    selectedFile.type.startsWith("video/")
+                        ? "video"
+                        : "image",
+
+                caption:
+                    captionInput.value.trim(),
+
+                likes: 0,
+
+                liked: false,
+
+                saved: false,
+
+                comments: [],
+
+                time: "Just now",
+
+                createdAt: Date.now()
+
+            };
+
+
+            posts.push(newPost);
+
+            savePosts();
+
+
+            alert("Your post has been published!");
+
+
+            // Return to home
+
+            if (typeof showPage === "function") {
+
+                showPage("home");
+
+            }
+
+
+            // Reset
+
+            fileInput.value = "";
+
+            captionInput.value = "";
+
+            selectedFile = null;
+
+            previewContainer.innerHTML = "";
+
+            editorStep.classList.add("hidden");
+
+            uploadStep.classList.remove("hidden");
+
+        };
+
+
+        reader.readAsDataURL(selectedFile);
+
+    });
+
+}
