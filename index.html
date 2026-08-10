@@ -1,1324 +1,679 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Pixora</title>
-
-<style>
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
-body{
-    font-family:Arial, Helvetica, sans-serif;
-    background:#fafafa;
-    color:#171717;
-}
-
-/* =========================
-   WELCOME SCREEN
-========================= */
-
-#welcome{
-    position:fixed;
-    inset:0;
-    z-index:9999;
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    text-align:center;
-
-    background:
-        radial-gradient(circle at 50% 30%, #6825a0, transparent 30%),
-        radial-gradient(circle at 10% 90%, #a51c70, transparent 30%),
-        radial-gradient(circle at 90% 10%, #2458a8, transparent 30%),
-        #08030d;
-
-    transition:opacity .7s ease;
-}
-
-#welcome.hidden{
-    opacity:0;
-    pointer-events:none;
-}
-
-.welcome-content{
-    animation:intro .9s ease;
-}
-
-@keyframes intro{
-    from{
-        opacity:0;
-        transform:translateY(25px) scale(.95);
-    }
-
-    to{
-        opacity:1;
-        transform:translateY(0) scale(1);
-    }
-}
-
-.logo{
-    width:150px;
-    height:150px;
-    border-radius:40px;
-    object-fit:contain;
-
-    box-shadow:
-        0 0 35px rgba(255,20,147,.35),
-        0 0 80px rgba(100,50,255,.25);
-}
-
-.welcome-title{
-    font-size:65px;
-    margin-top:25px;
-    font-weight:800;
-
-    background:linear-gradient(
-        90deg,
-        #ff1493,
-        #913cff,
-        #2588ff
-    );
-
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-}
-
-.welcome-subtitle{
-    color:#aaa;
-    letter-spacing:4px;
-    margin-top:5px;
-}
-
-.start{
-    margin-top:30px;
-
-    padding:15px 35px;
-
-    border:0;
-    border-radius:40px;
-
-    color:white;
-    font-size:16px;
-    font-weight:bold;
-
-    background:linear-gradient(
-        100deg,
-        #ff1493,
-        #813cff,
-        #2588ff
-    );
-
-    cursor:pointer;
-
-    transition:.3s;
-}
-
-.start:hover{
-    transform:scale(1.06);
-}
-
-
-/* =========================
-   APP
-========================= */
-
-#app{
-    display:none;
-}
-
-
-/* =========================
-   LEFT SIDEBAR
-========================= */
-
-.sidebar{
-    position:fixed;
-
-    left:0;
-    top:0;
-
-    width:245px;
-    height:100vh;
-
-    background:white;
-
-    border-right:1px solid #e5e5e5;
-
-    padding:30px 18px;
-
-    z-index:100;
-}
-
-.brand{
-    font-size:30px;
-    font-weight:800;
-
-    margin:0 15px 45px;
-
-    background:linear-gradient(
-        90deg,
-        #ff1493,
-        #833cff,
-        #2588ff
-    );
-
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-}
-
-.menu{
-    display:flex;
-    flex-direction:column;
-    gap:8px;
-}
-
-.menu button{
-    width:100%;
-
-    border:0;
-    background:white;
-
-    display:flex;
-    align-items:center;
-
-    gap:18px;
-
-    padding:14px 15px;
-
-    border-radius:12px;
-
-    font-size:16px;
-
-    cursor:pointer;
-
-    text-align:left;
-
-    transition:.2s;
-}
-
-.menu button:hover{
-    background:#f2f2f2;
-    transform:translateX(3px);
-}
-
-.menu button.active{
-    font-weight:bold;
-    background:#f2f2f2;
-}
-
-.icon{
-    font-size:24px;
-    width:25px;
-    text-align:center;
-}
-
-
-/* =========================
-   MAIN AREA
-========================= */
-
-.main{
-    margin-left:245px;
-
-    min-height:100vh;
-
-    padding:25px 30px;
-}
-
-
-/* =========================
-   TOP AREA
-========================= */
-
-.top{
-    max-width:950px;
-    margin:auto;
-
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-
-    margin-bottom:20px;
-}
-
-.mobile-brand{
-    display:none;
-    font-size:27px;
-    font-weight:bold;
-}
-
-
-/* =========================
-   STORIES
-========================= */
-
-.stories{
-    max-width:950px;
-
-    margin:auto;
-
-    background:white;
-
-    border:1px solid #e5e5e5;
-
-    border-radius:12px;
-
-    padding:18px;
-
-    display:flex;
-
-    gap:23px;
-
-    overflow-x:auto;
-}
-
-.stories::-webkit-scrollbar{
-    display:none;
-}
-
-.story{
-    min-width:65px;
-
-    text-align:center;
-
-    font-size:12px;
-
-    cursor:pointer;
-}
-
-.story-circle{
-    width:66px;
-    height:66px;
-
-    padding:3px;
-
-    border-radius:50%;
-
-    background:linear-gradient(
-        135deg,
-        #ff1493,
-        #ff9f00,
-        #803cff
-    );
-
-    margin-bottom:7px;
-}
-
-.story-inner{
-    width:100%;
-    height:100%;
-
-    border-radius:50%;
-
-    background:#ddd;
-
-    border:3px solid white;
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
-
-    font-size:27px;
-}
-
-
-/* =========================
-   FEED
-========================= */
-
-.feed{
-    width:650px;
-
-    max-width:100%;
-
-    margin:25px auto;
-}
-
-.post{
-    background:white;
-
-    border:1px solid #ddd;
-
-    border-radius:10px;
-
-    margin-bottom:25px;
-
-    overflow:hidden;
-}
-
-.post-header{
-    height:60px;
-
-    padding:10px 14px;
-
-    display:flex;
-    align-items:center;
-
-    gap:10px;
-}
-
-.post-avatar{
-    width:40px;
-    height:40px;
-
-    border-radius:50%;
-
-    background:linear-gradient(
-        135deg,
-        #ff1493,
-        #813cff
-    );
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
-
-    color:white;
-
-    font-weight:bold;
-}
-
-.post-name{
-    font-weight:bold;
-}
-
-.post-time{
-    color:#888;
-    font-size:12px;
-}
-
-
-/* POST IMAGE */
-
-.post-photo{
-    width:100%;
-
-    aspect-ratio:1/1;
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
-
-    font-size:100px;
-
-    color:white;
-
-    background:
-        linear-gradient(
-            135deg,
-            #ff1493,
-            #743cff,
-            #2488ff
-        );
-}
-
-
-/* POST ACTIONS */
-
-.actions{
-    padding:12px 14px;
-
-    display:flex;
-
-    gap:20px;
-}
-
-.actions button{
-    border:0;
-
-    background:white;
-
-    font-size:26px;
-
-    cursor:pointer;
-
-    transition:.2s;
-}
-
-.actions button:hover{
-    transform:scale(1.12);
-}
-
-.like.liked{
-    color:#ff1768;
-}
-
-.caption{
-    padding:0 14px 18px;
-
-    line-height:1.5;
-}
-
-.likes{
-    font-weight:bold;
-
-    margin-bottom:5px;
-}
-
-
-/* =========================
-   RIGHT SIDE
-========================= */
-
-.right{
-    position:fixed;
-
-    width:280px;
-
-    right:35px;
-    top:110px;
-}
-
-.user-card{
-    display:flex;
-
-    align-items:center;
-
-    gap:12px;
-
-    margin-bottom:25px;
-}
-
-.user-avatar{
-    width:55px;
-    height:55px;
-
-    border-radius:50%;
-
-    background:linear-gradient(
-        135deg,
-        #ff1493,
-        #743cff
-    );
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
-
-    color:white;
-
-    font-size:22px;
-}
-
-.user-info{
-    flex:1;
-}
-
-.user-info strong{
-    display:block;
-}
-
-.user-info span{
-    color:#888;
-    font-size:13px;
-}
-
-.switch{
-    color:#7b39ff;
-    border:0;
-    background:none;
-    font-weight:bold;
-    cursor:pointer;
-}
-
-.suggested-title{
-    color:#777;
-    font-weight:bold;
-    margin-bottom:15px;
-}
-
-.suggestion{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin:15px 0;
-}
-
-.suggestion-avatar{
-    width:38px;
-    height:38px;
-
-    border-radius:50%;
-
-    background:#ddd;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-}
-
-.follow{
-    margin-left:auto;
-
-    border:0;
-    background:none;
-
-    color:#743cff;
-
-    font-weight:bold;
-
-    cursor:pointer;
-}
-
-
-/* =========================
-   MOBILE NAV
-========================= */
-
-.mobile-nav{
-    display:none;
-}
-
-
-/* =========================
-   RESPONSIVE
-========================= */
-
-@media(max-width:1100px){
-
-    .right{
-        display:none;
-    }
-
-}
-
-@media(max-width:800px){
-
-    .sidebar{
-        width:75px;
-        padding:25px 10px;
-    }
-
-    .brand{
-        font-size:0;
-        margin:0 0 40px;
-        text-align:center;
-    }
-
-    .brand::after{
-        content:"P";
-        font-size:30px;
-    }
-
-    .menu button{
-        justify-content:center;
-        padding:15px 5px;
-    }
-
-    .menu span:last-child{
-        display:none;
-    }
-
-    .main{
-        margin-left:75px;
-    }
-
-}
-
-@media(max-width:600px){
-
-    .sidebar{
-        display:none;
-    }
-
-    .main{
-        margin-left:0;
-
-        padding:10px 0 70px;
-    }
-
-    .top{
-        padding:5px 15px;
-    }
-
-    .mobile-brand{
-        display:block;
-    }
-
-    .stories{
-        border-left:0;
-        border-right:0;
-        border-radius:0;
-
-        padding-left:15px;
-    }
-
-    .feed{
-        margin-top:15px;
-    }
-
-    .post{
-        border-left:0;
-        border-right:0;
-        border-radius:0;
-    }
-
-    .mobile-nav{
-        position:fixed;
-
-        bottom:0;
-        left:0;
-
-        width:100%;
-        height:65px;
-
-        background:white;
-
-        border-top:1px solid #ddd;
-
-        display:flex;
-
-        justify-content:space-around;
-        align-items:center;
-
-        z-index:500;
-    }
-
-    .mobile-nav button{
-        border:0;
-        background:white;
-
-        font-size:23px;
-
-        cursor:pointer;
-    }
-
-}
-
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Kenyagram</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #fafafa;
+            color: #111;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            height: 60px;
+            background: white;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 25px;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .nav-create {
+            border: none;
+            background: #111;
+            color: white;
+            padding: 9px 17px;
+            border-radius: 9px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* FEED */
+        .feed {
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 0 15px;
+        }
+
+        .post {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .post-header {
+            padding: 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+
+        .avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff9800, #e91e63, #673ab7);
+        }
+
+        .post-media {
+            width: 100%;
+            max-height: 700px;
+            object-fit: contain;
+            background: black;
+        }
+
+        .post-actions {
+            padding: 12px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .post-actions button {
+            border: none;
+            background: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .caption {
+            padding: 0 13px 15px;
+        }
+
+        /* MODAL */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.75);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .create-box {
+            width: 95%;
+            max-width: 900px;
+            height: 650px;
+            background: white;
+            border-radius: 14px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .create-header {
+            height: 55px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 18px;
+            font-weight: bold;
+        }
+
+        .create-header button {
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 22px;
+        }
+
+        .create-body {
+            flex: 1;
+            display: flex;
+        }
+
+        /* SELECT AREA */
+        .select-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 18px;
+            padding: 20px;
+        }
+
+        .upload-icon {
+            font-size: 65px;
+        }
+
+        .select-title {
+            font-size: 22px;
+        }
+
+        .select-button {
+            background: #0095f6;
+            color: white;
+            border: none;
+            padding: 11px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .select-button:hover {
+            background: #0077c8;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        /* EDIT AREA */
+        .edit-area {
+            display: none;
+            flex: 1;
+        }
+
+        .preview-area {
+            width: 60%;
+            background: #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-area img,
+        .preview-area video {
+            max-width: 100%;
+            max-height: 590px;
+            object-fit: contain;
+        }
+
+        .details-area {
+            width: 40%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .caption-input {
+            width: 100%;
+            height: 130px;
+            border: none;
+            outline: none;
+            resize: none;
+            font-size: 15px;
+            font-family: inherit;
+        }
+
+        .post-button {
+            margin-top: auto;
+            width: 100%;
+            padding: 12px;
+            border: none;
+            background: #0095f6;
+            color: white;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .back-button {
+            margin-bottom: 15px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        /* MOBILE */
+        @media (max-width: 700px) {
+
+            .create-box {
+                width: 100%;
+                height: 100%;
+                border-radius: 0;
+            }
+
+            .create-body {
+                display: block;
+            }
+
+            .preview-area {
+                width: 100%;
+                height: 55%;
+            }
+
+            .details-area {
+                width: 100%;
+                height: 45%;
+            }
+
+            .feed {
+                margin-top: 15px;
+            }
+        }
+    </style>
 </head>
-
 
 <body>
 
+    <!-- NAVIGATION -->
+    <nav class="navbar">
+        <div class="logo">Kenyagram</div>
 
-<!-- =========================
-     WELCOME
-========================= -->
-
-<section id="welcome">
-
-    <div class="welcome-content">
-
-        <img
-            src="pixora-logo.png"
-            class="logo"
-            alt="Pixora"
-        >
-
-        <h1 class="welcome-title">
-            Pixora
-        </h1>
-
-        <p class="welcome-subtitle">
-            SHARE · CONNECT · CREATE
-        </p>
-
-        <button
-            class="start"
-            onclick="openApp()"
-        >
-            ✨ Get Started
+        <button class="nav-create" onclick="openCreate()">
+            ＋ Create
         </button>
+    </nav>
 
-    </div>
 
-</section>
+    <!-- FEED -->
+    <main class="feed" id="feed">
 
-
-
-<!-- =========================
-     APP
-========================= -->
-
-<div id="app">
-
-
-<!-- =========================
-     SIDEBAR
-========================= -->
-
-<aside class="sidebar">
-
-    <div class="brand">
-        Pixora
-    </div>
-
-
-    <div class="menu">
-
-        <button
-            class="active"
-            onclick="page('home')"
-        >
-            <span class="icon">⌂</span>
-            <span>Home</span>
-        </button>
-
-
-        <button onclick="page('search')">
-            <span class="icon">⌕</span>
-            <span>Search</span>
-        </button>
-
-
-        <button onclick="page('messages')">
-            <span class="icon">✉</span>
-            <span>Messages</span>
-        </button>
-
-
-        <button onclick="page('notifications')">
-            <span class="icon">♡</span>
-            <span>Notifications</span>
-        </button>
-
-
-        <button onclick="createPost()">
-            <span class="icon">＋</span>
-            <span>Create</span>
-        </button>
-
-
-        <button onclick="page('profile')">
-            <span class="icon">◯</span>
-            <span>Profile</span>
-        </button>
-
-    </div>
-
-</aside>
-
-
-
-<!-- =========================
-     MAIN
-========================= -->
-
-<main class="main">
-
-
-    <div class="top">
-
-        <div class="mobile-brand">
-            Pixora
-        </div>
-
-    </div>
-
-
-    <!-- STORIES -->
-
-    <div class="stories">
-
-        <div class="story">
-
-            <div class="story-circle">
-                <div class="story-inner">
-                    +
-                </div>
-            </div>
-
-            Your story
-
-        </div>
-
-
-        <div class="story">
-
-            <div class="story-circle">
-                <div class="story-inner">
-                    😎
-                </div>
-            </div>
-
-            Alex
-
-        </div>
-
-
-        <div class="story">
-
-            <div class="story-circle">
-                <div class="story-inner">
-                    😊
-                </div>
-            </div>
-
-            Sarah
-
-        </div>
-
-
-        <div class="story">
-
-            <div class="story-circle">
-                <div class="story-inner">
-                    ⚽
-                </div>
-            </div>
-
-            David
-
-        </div>
-
-
-        <div class="story">
-
-            <div class="story-circle">
-                <div class="story-inner">
-                    🌟
-                </div>
-            </div>
-
-            Maya
-
-        </div>
-
-
-        <div class="story">
-
-            <div class="story-circle">
-                <div class="story-inner">
-                    🎵
-                </div>
-            </div>
-
-            Jay
-
-        </div>
-
-
-        <div class="story">
-
-            <div class="story-circle">
-                <div class="story-inner">
-                    🔥
-                </div>
-            </div>
-
-            Chris
-
-        </div>
-
-    </div>
-
-
-
-    <!-- =========================
-         FEED
-    ========================== -->
-
-    <div class="feed">
-
-
-        <!-- POST 1 -->
-
-        <article class="post">
+        <div class="post">
 
             <div class="post-header">
-
-                <div class="post-avatar">
-                    P
-                </div>
-
-                <div>
-
-                    <div class="post-name">
-                        pixora
-                    </div>
-
-                    <div class="post-time">
-                        1h
-                    </div>
-
-                </div>
-
+                <div class="avatar"></div>
+                <span>Kenyagram</span>
             </div>
 
-
-            <div class="post-photo">
-                📸
-            </div>
-
-
-            <div class="actions">
-
-                <button
-                    class="like"
-                    onclick="like(this)"
-                >
-                    ♡
-                </button>
-
-                <button>
-                    💬
-                </button>
-
-                <button>
-                    ↗
-                </button>
-
-                <button style="margin-left:auto">
-                    ♧
-                </button>
-
-            </div>
-
-
-            <div class="caption">
-
-                <div class="likes">
-                    <span class="like-count">128</span> likes
-                </div>
-
-                <p>
-                    <strong>pixora</strong>
-                    Welcome to Pixora! ✨
-                </p>
-
-                <p style="color:#888;margin-top:5px">
-                    View all 12 comments
-                </p>
-
-            </div>
-
-        </article>
-
-
-
-        <!-- POST 2 -->
-
-        <article class="post">
-
-            <div class="post-header">
-
-                <div class="post-avatar">
-                    A
-                </div>
-
-                <div>
-
-                    <div class="post-name">
-                        alex_pixora
-                    </div>
-
-                    <div class="post-time">
-                        3h
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div
-                class="post-photo"
-                style="
-                background:
-                linear-gradient(
-                135deg,
-                #ff9a3c,
-                #ff3c75,
-                #703cff
-                );
-                "
+            <img
+                class="post-media"
+                src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3"
+                alt="Example post"
             >
-                🌅
+
+            <div class="post-actions">
+                <button>♡</button>
+                <button>💬</button>
+                <button>↗</button>
             </div>
-
-
-            <div class="actions">
-
-                <button
-                    class="like"
-                    onclick="like(this)"
-                >
-                    ♡
-                </button>
-
-                <button>
-                    💬
-                </button>
-
-                <button>
-                    ↗
-                </button>
-
-                <button style="margin-left:auto">
-                    ♧
-                </button>
-
-            </div>
-
 
             <div class="caption">
+                <strong>Kenyagram</strong>
+                Welcome to Kenyagram 🇰🇪
+            </div>
 
-                <div class="likes">
-                    <span class="like-count">87</span> likes
-                </div>
+        </div>
 
-                <p>
-                    <strong>alex_pixora</strong>
-                    Beautiful day 🌅
-                </p>
+    </main>
+
+
+    <!-- CREATE POST MODAL -->
+    <div class="modal" id="createModal">
+
+        <div class="create-box">
+
+            <div class="create-header">
+
+                <button onclick="closeCreate()">×</button>
+
+                <span>Create new post</span>
+
+                <span></span>
 
             </div>
 
-        </article>
 
+            <div class="create-body">
+
+                <!-- SELECT FILE -->
+                <div class="select-area" id="selectArea">
+
+                    <div class="upload-icon">🖼️</div>
+
+                    <div class="select-title">
+                        Create a new post
+                    </div>
+
+                    <div>
+                        Choose a photo or video from your device
+                    </div>
+
+                    <button
+                        class="select-button"
+                        onclick="chooseFile()"
+                    >
+                        Select from device
+                    </button>
+
+                    <input
+                        type="file"
+                        id="fileInput"
+                        accept="image/*,video/*"
+                        onchange="previewFile(event)"
+                    >
+
+                </div>
+
+
+                <!-- PREVIEW + DETAILS -->
+                <div class="edit-area" id="editArea">
+
+                    <div class="preview-area" id="previewArea">
+                    </div>
+
+                    <div class="details-area">
+
+                        <button
+                            class="back-button"
+                            onclick="goBack()"
+                        >
+                            ← Back
+                        </button>
+
+                        <div class="user-info">
+
+                            <div class="avatar"></div>
+
+                            <span>Kenyagram User</span>
+
+                        </div>
+
+                        <textarea
+                            id="caption"
+                            class="caption-input"
+                            placeholder="Write a caption..."
+                        ></textarea>
+
+                        <button
+                            class="post-button"
+                            onclick="publishPost()"
+                        >
+                            Share
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
-
-
-</main>
-
-
-
-<!-- =========================
-     RIGHT SIDEBAR
-========================= -->
-
-<aside class="right">
-
-
-    <div class="user-card">
-
-        <div class="user-avatar">
-            👤
-        </div>
-
-        <div class="user-info">
-
-            <strong>
-                your_username
-            </strong>
-
-            <span>
-                Your Pixora profile
-            </span>
-
-        </div>
-
-        <button class="switch">
-            Switch
-        </button>
-
-    </div>
-
-
-
-    <div class="suggested-title">
-        Suggested for you
-    </div>
-
-
-    <div class="suggestion">
-
-        <div class="suggestion-avatar">
-            😎
-        </div>
-
-        <div class="user-info">
-            <strong>jordan</strong>
-            <span>New to Pixora</span>
-        </div>
-
-        <button class="follow">
-            Follow
-        </button>
-
-    </div>
-
-
-    <div class="suggestion">
-
-        <div class="suggestion-avatar">
-            ⚽
-        </div>
-
-        <div class="user-info">
-            <strong>football_zone</strong>
-            <span>Popular</span>
-        </div>
-
-        <button class="follow">
-            Follow
-        </button>
-
-    </div>
-
-
-    <div class="suggestion">
-
-        <div class="suggestion-avatar">
-            🎵
-        </div>
-
-        <div class="user-info">
-            <strong>musicdaily</strong>
-            <span>Suggested</span>
-        </div>
-
-        <button class="follow">
-            Follow
-        </button>
-
-    </div>
-
-</aside>
-
-
-
-<!-- =========================
-     MOBILE NAV
-========================= -->
-
-<nav class="mobile-nav">
-
-    <button onclick="page('home')">
-        ⌂
-    </button>
-
-    <button onclick="page('search')">
-        ⌕
-    </button>
-
-    <button onclick="createPost()">
-        ＋
-    </button>
-
-    <button onclick="page('notifications')">
-        ♡
-    </button>
-
-    <button onclick="page('profile')">
-        ◯
-    </button>
-
-</nav>
-
-
-</div>
-
 
 
 <script>
 
+    let selectedFile = null;
+    let previewURL = null;
 
-/* OPEN APP */
 
-function openApp(){
+    /* OPEN CREATE */
 
-    document
-        .getElementById("welcome")
-        .classList.add("hidden");
-
-    setTimeout(function(){
+    function openCreate() {
 
         document
-            .getElementById("welcome")
-            .style.display="none";
+            .getElementById("createModal")
+            .classList.add("active");
+
+    }
+
+
+    /* CLOSE CREATE */
+
+    function closeCreate() {
 
         document
-            .getElementById("app")
-            .style.display="block";
+            .getElementById("createModal")
+            .classList.remove("active");
 
-    },700);
-
-}
-
-
-
-/* LIKE */
-
-function like(button){
-
-    const post =
-        button.closest(".post");
-
-    const count =
-        post.querySelector(".like-count");
-
-    let number =
-        parseInt(count.textContent);
-
-
-    if(button.classList.contains("liked")){
-
-        button.classList.remove("liked");
-
-        button.textContent="♡";
-
-        number--;
-
-    }else{
-
-        button.classList.add("liked");
-
-        button.textContent="♥";
-
-        number++;
+        resetCreate();
 
     }
 
-    count.textContent=number;
 
-}
+    /* SELECT FILE */
 
+    function chooseFile() {
 
-
-/* CREATE */
-
-function createPost(){
-
-    alert(
-        "📸 Pixora Create\n\n" +
-        "We'll build the real photo uploader next!"
-    );
-
-}
-
-
-
-/* NAVIGATION */
-
-function page(name){
-
-    if(name==="search"){
-
-        alert("🔍 Pixora Search");
+        document
+            .getElementById("fileInput")
+            .click();
 
     }
 
-    if(name==="messages"){
 
-        alert("✉ Pixora Messages");
+    /* PREVIEW FILE */
+
+    function previewFile(event) {
+
+        const file = event.target.files[0];
+
+        if (!file) return;
+
+        selectedFile = file;
+
+        previewURL = URL.createObjectURL(file);
+
+        const previewArea =
+            document.getElementById("previewArea");
+
+        previewArea.innerHTML = "";
+
+        if (file.type.startsWith("video/")) {
+
+            const video =
+                document.createElement("video");
+
+            video.src = previewURL;
+
+            video.controls = true;
+
+            video.autoplay = true;
+
+            video.muted = true;
+
+            previewArea.appendChild(video);
+
+        }
+
+        else if (file.type.startsWith("image/")) {
+
+            const image =
+                document.createElement("img");
+
+            image.src = previewURL;
+
+            previewArea.appendChild(image);
+
+        }
+
+        document
+            .getElementById("selectArea")
+            .style.display = "none";
+
+        document
+            .getElementById("editArea")
+            .style.display = "flex";
 
     }
 
-    if(name==="notifications"){
 
-        alert("♡ Pixora Notifications");
+    /* GO BACK */
 
-    }
+    function goBack() {
 
-    if(name==="profile"){
-
-        alert("◯ Pixora Profile");
+        resetCreate();
 
     }
 
-}
 
+    /* RESET */
+
+    function resetCreate() {
+
+        selectedFile = null;
+
+        if (previewURL) {
+
+            URL.revokeObjectURL(previewURL);
+
+        }
+
+        previewURL = null;
+
+        document
+            .getElementById("previewArea")
+            .innerHTML = "";
+
+        document
+            .getElementById("caption")
+            .value = "";
+
+        document
+            .getElementById("selectArea")
+            .style.display = "flex";
+
+        document
+            .getElementById("editArea")
+            .style.display = "none";
+
+        document
+            .getElementById("fileInput")
+            .value = "";
+
+    }
+
+
+    /* PUBLISH */
+
+    function publishPost() {
+
+        if (!selectedFile) return;
+
+        const caption =
+            document
+                .getElementById("caption")
+                .value;
+
+        const post =
+            document.createElement("div");
+
+        post.className = "post";
+
+
+        /* HEADER */
+
+        const header =
+            document.createElement("div");
+
+        header.className = "post-header";
+
+        header.innerHTML = `
+            <div class="avatar"></div>
+            <span>Kenyagram User</span>
+        `;
+
+
+        /* MEDIA */
+
+        let media;
+
+        if (selectedFile.type.startsWith("video/")) {
+
+            media =
+                document.createElement("video");
+
+            media.controls = true;
+            media.className = "post-media";
+
+        } else {
+
+            media =
+                document.createElement("img");
+
+            media.className = "post-media";
+
+        }
+
+        media.src = previewURL;
+
+
+        /* ACTIONS */
+
+        const actions =
+            document.createElement("div");
+
+        actions.className = "post-actions";
+
+        actions.innerHTML = `
+            <button>♡</button>
+            <button>💬</button>
+            <button>↗</button>
+        `;
+
+
+        /* CAPTION */
+
+        const captionElement =
+            document.createElement("div");
+
+        captionElement.className = "caption";
+
+        captionElement.innerHTML =
+            `<strong>Kenyagram User</strong> ${
+                escapeHTML(caption)
+            }`;
+
+
+        post.appendChild(header);
+        post.appendChild(media);
+        post.appendChild(actions);
+        post.appendChild(captionElement);
+
+
+        document
+            .getElementById("feed")
+            .prepend(post);
+
+
+        closeCreate();
+
+    }
+
+
+    /* SECURITY */
+
+    function escapeHTML(text) {
+
+        const div =
+            document.createElement("div");
+
+        div.textContent = text;
+
+        return div.innerHTML;
+
+    }
 
 </script>
 
